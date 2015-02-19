@@ -1,0 +1,12 @@
+diff -uir go-yara-2786608186b745d0dc67a04a54c6d0e55cd68fdc.orig/cgo.go go-yara-2786608186b745d0dc67a04a54c6d0e55cd68fdc/cgo.go
+--- go-yara-2786608186b745d0dc67a04a54c6d0e55cd68fdc.orig/cgo.go	2015-02-19 17:36:24.000000000 +0100
++++ go-yara-2786608186b745d0dc67a04a54c6d0e55cd68fdc/cgo.go	2015-02-19 17:36:41.000000000 +0100
+@@ -6,7 +6,7 @@
+ 
+ /*
+ // #cgo linux freebsd netbsd darwin CFLAGS: -I/path/to/include/
+-#cgo linux freebsd netbsd darwin LDFLAGS: -lyara
++#cgo LDFLAGS: -lyara
+ 
+ // Use something like the following with the MinGW-w64 cross compiler:
+ 
