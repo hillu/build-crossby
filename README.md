@@ -33,14 +33,37 @@ Assumptions
 Configure
 ---------
 
-### TODO: Add, edit, remove source packages
+### Add, edit, remove source packages
 
-### TODO: Manage architectures
+The `PACKAGES` variable contains a list of packages that should be
+built. For every package, there is a configuration file
+package/$PKG.mk which describes how to fetch and build the package.
+
+- `pkg_VERSION`
+- `pkg_URL`
+- `pkg_POSTUNPACK`: Command that should be run after unpacking
+- `pkg_BUiLDSYSTEM`: The buildsystem used by this package.
+- `pkg_BUILDFLAGS`: Extra build flags that are passed to the buildsystem
+- `pkg_CFLAGS`, `pkg_$ARCH_CFLAGS`: CFLAGS variable (general,
+  architecture-specific) for this package
+- `pkg_SUFFIX`: archive file format for this package
+- `pkg_NAMESPACE`: (specific to the `go` buildsystem): Namespace into
+  which the package is installed.
+
+### Manage architectures
+
+The `ARCHS` variable contains a list of architectures for which every
+package should be built.
 
 Eextend
 -------
 
-### TODO: Add build systems
+To add new buildsystems, the following functions (shell variables)
+must be implemented:
+
+- `buildsys_UNPACK`
+- `buildsys_BUILD`
+- `buildsys_INSTALL`
 
 Author
 ------
