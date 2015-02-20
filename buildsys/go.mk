@@ -2,7 +2,7 @@ define go_UNPACK
 build/$(1)/$(2)/.unpack-stamp:
 	mkdir -p build/$(1)/$(2)/src/$($(1)_NAMESPACE)
 	tar --strip=1 -xzf $($(1)_TARBALL) -C build/$(1)/$(2)/src/$($(1)_NAMESPACE)
-	for patch in $(wildcard package/$(1)/$($(1)_VERSION)/*.patch); do \
+	for patch in $(wildcard patches/$(1)/$($(1)_VERSION)/*.patch); do \
 		patch -d build/$(1)/$(2)/src/$($(1)_NAMESPACE) -p1 < $$$$patch ; \
 	done
 	touch $$@
