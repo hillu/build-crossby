@@ -3,24 +3,25 @@ include buildsys/*.mk
 $(foreach pkg,$(PACKAGES),$(eval include package/$(pkg).mk))
 
 help:
-	@echo build crosby: Help
-	@echo ==================
-	@echo
-	@echo Targets
-	@echo -------
-	@echo - download, download/PACKAGE
-	@echo - unpack,   unpack/PACKAGE
-	@echo - build,    build/PACKAGE,   build/PACKAGE/ARCH
-	@echo - install,  install/PACKAGE, install/PACKAGE/ARCH
-	@echo - clean,    clean/PACKAGE,   clean/PACKAGE/ARCH
-	@echo - bleach: Remove everything except the build scripts and configuration
-	@echo - dump:   Dump generated bits of this Makefile for debugging purposes
-	@echo
-	@echo Current configuration
-	@echo ---------------------
-	@echo Packages: $(PACKAGES)
-	@echo Supported architectures:
-	@echo $(ARCHS)
+	$(info build crosby: Help)
+	$(info ==================)
+	$(info )
+	$(info Targets)
+	$(info -------)
+	$(info - download, download/PACKAGE)
+	$(info - unpack,   unpack/PACKAGE)
+	$(info - build,    build/PACKAGE,   build/PACKAGE/ARCH)
+	$(info - install,  install/PACKAGE, install/PACKAGE/ARCH)
+	$(info - clean,    clean/PACKAGE,   clean/PACKAGE/ARCH)
+	$(info - bleach: Remove everything except the build scripts and configuration)
+	$(info - dump:   Dump generated bits of this Makefile for debugging purposes)
+	$(info )
+	$(info Current configuration)
+	$(info ---------------------)
+	$(info Packages: $(PACKAGES))
+	$(info Supported architectures:)
+	$(info $(ARCHS))
+	@true
 
 COMMENT=\#
 dump:
@@ -102,7 +103,7 @@ endef
 bleach: clean
 	rm -rf cache target
 
-.PHONY: download unpack build install clean bleach dump
+.PHONY: help download unpack build install clean bleach dump
 
 $(foreach pkg,$(PACKAGES),\
 	$(eval $(call DOWNLOAD,$(pkg))) \
