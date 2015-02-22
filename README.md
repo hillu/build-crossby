@@ -30,14 +30,27 @@ Assumptions
 - Building the cross-toolchains is a problem that has been solved --
   the task does not need to be repeated as part of this project.
 
-Configure
----------
+Usage
+-----
 
-### Add, edit, remove source packages
+Typing `make` gives a list of targets that can be run. They are
+controlled by the main configuration file (`default.mk`) and
+package-specific configuration files.
 
 The `PACKAGES` variable contains a list of packages that should be
-built. For every package, there is a configuration file
-package/$PKG.mk which describes how to fetch and build the package.
+built. For every package, Makefile snippet `package/$PKG.mk` is
+included which describes how to fetch and build the package. If
+`PACKAGES` is not specified, all `*.mk` files in the `pacakge`
+subdirectory are included.
+
+The `ARCHS` variable contains a list of architectures for which every
+package should be built. If not set, it defaults to x86 and x86_64
+architectures for Linux and Windows.
+
+Configuration
+-------------
+
+### Add, edit, remove source packages
 
 - `pkg_VERSION`
 - `pkg_URL`
@@ -50,13 +63,8 @@ package/$PKG.mk which describes how to fetch and build the package.
 - `pkg_NAMESPACE`: (specific to the `go` buildsystem): Namespace into
   which the package is installed.
 
-### Manage architectures
-
-The `ARCHS` variable contains a list of architectures for which every
-package should be built.
-
-Eextend
--------
+Extending
+---------
 
 To add new buildsystems, the following functions (shell variables)
 must be implemented:
@@ -65,7 +73,20 @@ must be implemented:
 - `buildsys_BUILD`
 - `buildsys_INSTALL`
 
-Author
-------
+License
+-------
 
-Hilko Bengen <bengen@hilluzination.de>
+Copyright (C) 2015  Hilko Bengen <bengen@hilluzination.de>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
