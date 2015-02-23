@@ -151,9 +151,6 @@ endef
 define go_BUILD
 # go_BUILD PACKAGE=$(1) ARCH=$(2)
 build/$(1)/$(2)/.build-stamp:
-	@echo ARCH=$(2)
-	echo GOOS=$(call GOOS,$(2))
-	echo GOARCH=$(call GOARCH,$(2))
 	cd build/$(1)/$(2)/ && \
 		CGO_CFLAGS=-I$(PWD)/target/include \
 		CGO_LDFLAGS=-L$(PWD)/target/lib/$(2) \
@@ -163,13 +160,13 @@ build/$(1)/$(2)/.build-stamp:
 		CGO_ENABLED=1 \
 		go install -x --ldflags '-extldflags "-static"' $($(1)_NAMESPACE)
 	touch $$@
-# end go_BUILD PACKAGE=$(1) ARCH=$(2)
+# END go_BUILD PACKAGE=$(1) ARCH=$(2)
 endef
 define go_INSTALL
 # go_INSTALL PACKAGE=$(1) ARCH=$(2)
 build/$(1)/$(2)/.install-stamp:
 	mkdir -p $(PWD)/target/lib/go
-	cp -rt $(PWD)/target/lib/go/ build/$(1)/$(2)/pkg build/$(1)/$(2)/src
+	cp -urt $(PWD)/target/lib/go/ build/$(1)/$(2)/pkg build/$(1)/$(2)/src
 	touch $$@
 # END go_INSTALL PACKAGE=$(1) ARCH=$(2)
 endef
