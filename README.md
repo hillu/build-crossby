@@ -4,7 +4,9 @@ build crossby
 This is an attempt at creating an _GNU Make_-based environment for
 reliably building libraries and executables from the same source code
 for multiple platforms. Building everything from source should be as
-easy as running a single `make` command.
+easy as running a single `make` command. New source packages can be
+defined using a handful of definitions; everything beyond that is
+generated from templates.
 
 Currently supported target platforms are i386, x86_64 for Linux-based
 and MS Windows-based systems. Currently supported build systems are
@@ -62,6 +64,7 @@ Configuration
 - `pkg_SUFFIX`: archive file format for this package
 - `pkg_NAMESPACE`: (specific to the `go` buildsystem): Namespace into
   which the package is installed.
+- `pkg_ARCHS`: Limits the architectures for which this package can be built
 
 Extending
 ---------
