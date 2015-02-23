@@ -49,6 +49,9 @@ The `ARCHS` variable contains a list of architectures for which every
 package should be built. If not set, it defaults to x86 and x86_64
 architectures for Linux and Windows.
 
+Before build, the sources can be patched. For this, all *.patch files
+in `patches/$PKG/$VERSION` are used.
+
 Configuration
 -------------
 

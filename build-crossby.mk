@@ -82,9 +82,8 @@ define generic_UNPACK
 build/$(1)/$(2)/.unpack-stamp:
 	mkdir -p $$(dir $$@)
 	tar --strip=1 -xzf $($(1)_TARBALL) -C $$(dir $$@)
-	for patch in $(wildcard patches/$(1)/$($(1)_VERSION)/*.patch); do \
-		patch -d $$(dir $$@) -p1 < $$$$patch ; \
-	done
+	$(foreach patch,$(sort $(wildcard patches/$(1)/$($(1)_VERSION)/*.patch)),\
+		patch -d $$(dir $$@) -p1 < $(patch))
 ifneq ($($(1)_POSTUNPACK),)
 	cd $$(dir $$@) && $($(1)_POSTUNPACK)
 endif
@@ -142,9 +141,8 @@ define go_UNPACK
 build/$(1)/$(2)/.unpack-stamp:
 	mkdir -p build/$(1)/$(2)/src/$($(1)_NAMESPACE)
 	tar --strip=1 -xzf $($(1)_TARBALL) -C build/$(1)/$(2)/src/$($(1)_NAMESPACE)
-	for patch in $(wildcard patches/$(1)/$($(1)_VERSION)/*.patch); do \
-		patch -d build/$(1)/$(2)/src/$($(1)_NAMESPACE) -p1 < $$$$patch ; \
-	done
+	$(foreach patch,$(sort $(wildcard patches/$(1)/$($(1)_VERSION)/*.patch)),\
+		patch -d build/$(1)/$(2)/src/$($(1)_NAMESPACE) -p1 < $(patch))
 	touch $$@
 # END go_UNPACK PACKAGE=$(1) ARCH=$(2)
 endef
