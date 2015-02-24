@@ -14,19 +14,12 @@ help:
 	$(info )
 	$(info Current configuration)
 	$(info ---------------------)
-	$(info BUILD_CROSSBY_ROOT = $(BUILD_CROSSBY_ROOT))
-	$(info BUILD_CROSSBY_PROJECT_FILE = $(BUILD_CROSSBY_PROJECT_FILE))
+	$(info ROOT = $(ROOT))
+	$(info PROJECT = $(PROJECT) (File: $(ROOT)/$(PROJECT).mk))
 	$(info PACKAGES = $(PACKAGES))
 	$(info ARCHS = $(ARCHS))
 	@true
 
 .PHONY: help
 
-BUILD_CROSSBY_ROOT ?= $(PWD)
-BUILD_CROSSBY_PROJECT_FILE ?= $(PWD)/default.mk
-ARCHS ?= x86_64-linux-gnu i386-linux-gnu i686-w64-mingw32 x86_64-w64-mingw32
-PACKAGES ?= $(patsubst %.mk,%,$(notdir $(wildcard package/*.mk)))
-
-include $(BUILD_CROSSBY_ROOT)/build-crossby.mk
-
-
+include $(PWD)/build-crossby.mk

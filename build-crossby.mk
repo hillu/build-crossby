@@ -1,5 +1,13 @@
-include $(BUILD_CROSSBY_PROJECT_FILE)
-$(foreach pkg,$(PACKAGES),$(eval include package/$(pkg).mk))
+# DEFAULT VALUES
+# --------------
+
+ROOT     ?= $(PWD)
+PROJECT  ?= default
+ARCHS    ?= x86_64-linux-gnu i386-linux-gnu i686-w64-mingw32 x86_64-w64-mingw32
+PACKAGES ?= $(patsubst %.mk,%,$(notdir $(wildcard $(ROOT)/package/*.mk)))
+
+include $(ROOT)/$(PROJECT).mk
+$(foreach pkg,$(PACKAGES),$(eval include $(ROOT)/package/$(pkg).mk))
 
 # GENERIC TOP-LEVEL TEMPLATES
 # ---------------------------
