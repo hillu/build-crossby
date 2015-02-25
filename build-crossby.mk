@@ -110,7 +110,9 @@ define autoconf_BUILD
 # autoconf_BUILD PACKAGE=$(1) ARCH=$(2)
 build/$(1)/$(2)/.build-stamp:
 	cd $$(dir $$@) && ./configure --host=$(2) \
+		CPPFLAGS="-I$(PWD)/target/include" \
 		CFLAGS="$(strip $(if $(findstring x86_64,$(2)),-m64,-m32) $($(1)_CFLAGS) $($(1)_$(2)_CFLAGS))" \
+		PKG_CONFIG_PATH=$(PWD)/target/lib/$(2)/pkgconfig \
 		$($(1)_BUILDFLAGS) $($(1)_$(2)_BUILDFLAGS) \
 		--prefix=$(PWD)/target \
 		--includedir='$$$$(prefix)/include' \
