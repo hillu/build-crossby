@@ -9,6 +9,7 @@ help:
 	$(info - build,    build/PACKAGE,   build/PACKAGE/ARCH)
 	$(info - install,  install/PACKAGE, install/PACKAGE/ARCH)
 	$(info - clean,    clean/PACKAGE,   clean/PACKAGE/ARCH)
+	$(info - clear-install: Remove target directory and .install-stamp files)
 	$(info - bleach: Remove everything except the build scripts and configuration)
 	$(info - dump:   Dump generated bits of this Makefile for debugging purposes)
 	$(info )

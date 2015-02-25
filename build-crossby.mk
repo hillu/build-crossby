@@ -63,7 +63,10 @@ build/$(1)/$(2)/.install-stamp: build/$(1)/$(2)/.build-stamp
 install/$(1)/$(2): build/$(1)/$(2)/.install-stamp
 install/$(1): install/$(1)/$(2)
 install: install/$(1)/$(2)
-.PHONY: install/$(1)/$(2)
+clear-install/$(1)/$(2):
+	rm -f build/$(1)/$(2)/.install-stamp
+clear-install: clear-install/$(1)/$(2)
+.PHONY: install/$(1)/$(2) clear-install/$(1)/$(2)
 # END INSTALL PACKAGE=$(1) ARCH=$(2)
 
 # CLEAN PACKAGE=$(1) ARCH=$(2)
@@ -77,10 +80,12 @@ clean: clean/$(1)/$(2)
 
 endef
 
-bleach: clean
-	rm -rf cache target
+clear-install:
+	rm -rf $(PWD)/target
+bleach: clean clear-install
+	rm -rf cache
 
-.PHONY: download unpack build install clean bleach dump
+.PHONY: download unpack build install clear-install clean bleach dump
 
 # BUILD SYSTEM-SPECIFIC TEMPLATES
 # -------------------------------
