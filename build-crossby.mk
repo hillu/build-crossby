@@ -42,8 +42,8 @@ unpack: unpack/$(1)/$(2)
 .PHONY: unpack/$(1) unpack/$(1)/$(2)
 # END UNPACK PACKAGE=$(1) ARCH=$(2)
 
-# DEPENDENCIES $(1): $($(1)_DEPENDS)
-$(foreach dep,$($(1)_DEPENDS),build/$(1)/$(2)/.build-stamp: build/$(dep)/$(2)/.install-stamp)
+# DEPENDENCIES $(1) $($(1)_DEPENDS)
+build/$(1)/$(2)/.build-stamp: $(patsubst %,build/%/$(2)/.install-stamp,$($(1)_DEPENDS))
 # END DEPENDENCIES
 
 # BUILD PACKAGE=$(1) ARCH=$(2)
