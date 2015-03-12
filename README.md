@@ -43,22 +43,22 @@ the command line.
 
 ### Variables
 
-- `ROOT` points to the top-level directory where all
+- `BC_ROOT` points to the top-level directory where all
 information about the build are stored. Default: Current working
 directory.
 
-- `PROJECT` determines which project should be built. The main
+- `BC_PROJECT` determines which project should be built. The main
 configuration file (`$ROOT/$PROJECT.mk`) is determined using this
 variable. Default: `default` (so the default configuration file is
 `default.mk` in the current working directory).
 
-- `PACKAGES` contains a list of packages that should be built. For
+- `BC_PACKAGES` contains a list of packages that should be built. For
 every package, Makefile snippet `package/$PKG.mk` is included which
 describes how to fetch and build the package. If `PACKAGES` is not
 specified, all `*.mk` files in `$ROOT/pacakge` subdirectory are
 included.
 
-- `ARCHS` contains a list of architectures for which every
+- `BC_ARCHS` contains a list of architectures for which every
 package should be built. If not set, it defaults to x86 and x86_64
 architectures for Linux and Windows.
 

@@ -15,12 +15,13 @@ help:
 	$(info )
 	$(info Current configuration)
 	$(info ---------------------)
-	$(info ROOT = $(ROOT))
-	$(info PROJECT = $(PROJECT) (File: $(ROOT)/$(PROJECT).mk))
-	$(info PACKAGES = $(PACKAGES))
-	$(info ARCHS = $(ARCHS))
+	$(info BC_ROOT = $(BC_ROOT))
+	$(info BC_PROJECT = $(BC_PROJECT) (File: $(BC_ROOT)/$(BC_PROJECT).mk))
+	$(info BC_PACKAGES = $(BC_PACKAGES))
+	$(info BC_ARCHS = $(BC_ARCHS))
 	@true
 
 .PHONY: help
 
+BC_IMPORT = 1
 include $(PWD)/build-crossby.mk

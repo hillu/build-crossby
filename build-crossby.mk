@@ -1,28 +1,46 @@
+# build-crossby.
+#
+# Copyright (C) 2015  Hilko Bengen
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 # DEFAULT VALUES
 # --------------
 
-ROOT     ?= $(PWD)
-PROJECT  ?= default
-ARCHS    ?= x86_64-linux-gnu i386-linux-gnu i686-w64-mingw32 x86_64-w64-mingw32
-PACKAGES ?= $(patsubst %.mk,%,$(notdir $(wildcard $(ROOT)/package/*.mk)))
+BC_ROOT     ?= $(PWD)
+BC_PROJECT  ?= default
+BC_ARCHS    ?= x86_64-linux-gnu i386-linux-gnu i686-w64-mingw32 x86_64-w64-mingw32
+BC_PACKAGES ?= $(patsubst %.mk,%,$(notdir $(wildcard $(BC_ROOT)/package/*.mk)))
+BC_IMPORT   ?=
 
-include $(ROOT)/$(PROJECT).mk
-$(foreach pkg,$(PACKAGES),$(eval include $(ROOT)/package/$(pkg).mk))
+include $(BC_ROOT)/$(BC_PROJECT).mk
+$(foreach pkg,$(BC_PACKAGES),$(eval include $(BC_ROOT)/package/$(pkg).mk))
 
 # GENERIC TOP-LEVEL TEMPLATES
 # ---------------------------
 
 define GEN_INDEP_TEMPLATE
 # DOWNLOAD $(1)
-$(1)_TARBALL = cache/$(1)-$($(1)_VERSION)$($(1)_SUFFIX)
+$(1)_TARBALL = $(BC_ROOT)/cache/$(1)-$($(1)_VERSION)$($(1)_SUFFIX)
 $$($(1)_TARBALL):
-	mkdir -p cache
+	mkdir -p $(dirname $$@)
 	wget -c -O $$@.t $($(1)_URL)
 	mv $$@.t $$@
 
-download/$(1): $$($(1)_TARBALL)
-download: download/$(1)
-.PHONY: download/$(1)
+BC/download/$(1): $$($(1)_TARBALL)
+BC/download: BC/download/$(1)
+.PHONY: BC/download/$(1)
 # END DOWNLOAD $(1)
 
 endef
@@ -35,64 +53,64 @@ define _GEN_ARCH_TEMPLATE
 # UNPACK PACKAGE=$(1) ARCH=$(2)
 $(call $($(1)_BUILDSYSTEM)_UNPACK,$(1),$(2))
 
-build/$(1)/$(2)/.unpack-stamp: $($(1)_TARBALL)
-unpack/$(1)/$(2): build/$(1)/$(2)/.unpack-stamp
-unpack/$(1): unpack/$(1)/$(2)
-unpack: unpack/$(1)/$(2)
-.PHONY: unpack/$(1) unpack/$(1)/$(2)
+$(BC_ROOT)/build/$(1)/$(2)/.unpack-stamp: $($(1)_TARBALL)
+BC/unpack/$(1)/$(2): $(BC_ROOT)/build/$(1)/$(2)/.unpack-stamp
+BC/unpack/$(1): BC/unpack/$(1)/$(2)
+BC/unpack: BC/unpack/$(1)/$(2)
+.PHONY: BC/unpack/$(1) BC/unpack/$(1)/$(2)
 # END UNPACK PACKAGE=$(1) ARCH=$(2)
 
 # DEPENDENCIES $(1) $($(1)_DEPENDS)
-build/$(1)/$(2)/.build-stamp: $(patsubst %,build/%/$(2)/.install-stamp,$($(1)_DEPENDS))
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: $(patsubst %,$(BC_ROOT)/build/%/$(2)/.install-stamp,$($(1)_DEPENDS))
 # END DEPENDENCIES
 
 # BUILD PACKAGE=$(1) ARCH=$(2)
 $(call $($(1)_BUILDSYSTEM)_BUILD,$(1),$(2))
 
-build/$(1)/$(2)/.build-stamp: build/$(1)/$(2)/.unpack-stamp
-build/$(1)/$(2): build/$(1)/$(2)/.build-stamp
-build/$(1): build/$(1)/$(2)
-build: build/$(1)/$(2)
-.PHONY: build/$(1) build/$(1)/$(2)
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: $(BC_ROOT)/build/$(1)/$(2)/.unpack-stamp
+BC/build/$(1)/$(2): $(BC_ROOT)/build/$(1)/$(2)/.build-stamp
+BC/build/$(1): BC/build/$(1)/$(2)
+BC/build: BC/build/$(1)/$(2)
+.PHONY: BC/build/$(1) BC/build/$(1)/$(2)
 # END BUILD PACKAGE=$(1) ARCH=$(2)
 
 # INSTALL PACKAGE=$(1) ARCH=$(2)
 $(call $($(1)_BUILDSYSTEM)_INSTALL,$(1),$(2))
 
-build/$(1)/$(2)/.install-stamp: build/$(1)/$(2)/.build-stamp
-install/$(1)/$(2): build/$(1)/$(2)/.install-stamp
-install/$(1): install/$(1)/$(2)
-install: install/$(1)/$(2)
-clear-install/$(1)/$(2):
-	rm -f build/$(1)/$(2)/.install-stamp
-clear-install: clear-install/$(1)/$(2)
-.PHONY: install/$(1)/$(2) clear-install/$(1)/$(2)
+$(BC_ROOT)/build/$(1)/$(2)/.install-stamp: $(BC_ROOT)/build/$(1)/$(2)/.build-stamp
+BC/install/$(1)/$(2): $(BC_ROOT)/build/$(1)/$(2)/.install-stamp
+BC/install/$(1): BC/install/$(1)/$(2)
+BC/install: BC/install/$(1)/$(2)
+BC/clear-install/$(1)/$(2):
+	rm -f $(BC_ROOT)/build/$(1)/$(2)/.install-stamp
+BC/clear-install: BC/clear-install/$(1)/$(2)
+.PHONY: BC/install/$(1)/$(2) BC/clear-install/$(1)/$(2)
 # END INSTALL PACKAGE=$(1) ARCH=$(2)
 
 # CLEAN PACKAGE=$(1) ARCH=$(2)
-clean/$(1)/$(2):
-	rm -rf build/$(1)/$(2)/
+BC/clean/$(1)/$(2):
+	rm -rf $(BC_ROOT)/build/$(1)/$(2)/
 
-clean/$(1): clean/$(1)/$(2)
-clean: clean/$(1)/$(2)
-.PHONY: clean/$(1)/$(2)
+BC/clean/$(1): BC/clean/$(1)/$(2)
+BC/clean: BC/clean/$(1)/$(2)
+.PHONY: BC/clean/$(1)/$(2)
 # END CLEAN PACKAGE=$(1) ARCH=$(2)
 
 endef
 
-clear-install:
-	rm -rf $(PWD)/target
-bleach: clean clear-install
-	rm -rf cache
+BC/clear-install:
+	rm -rf $(BC_ROOT)/target
+BC/bleach: BC/clean BC/clear-install
+	rm -rf $(BC_ROOT)/cache
 
-.PHONY: download unpack build install clear-install clean bleach dump
+.PHONY: BC/download BC/unpack BC/build BC/install BC/clear-install BC/clean BC/bleach BC/dump
 
 # BUILD SYSTEM-SPECIFIC TEMPLATES
 # -------------------------------
 
 define generic_UNPACK
 # generic_UNPACK PACKAGE=$(1) ARCH=$(2)
-build/$(1)/$(2)/.unpack-stamp:
+$(BC_ROOT)/build/$(1)/$(2)/.unpack-stamp:
 	mkdir -p $$(dir $$@)
 	tar --strip=1 -xzf $($(1)_TARBALL) -C $$(dir $$@)
 	$(foreach patch,$(sort $(wildcard patches/$(1)/$($(1)_VERSION)/*.patch)),\
@@ -108,13 +126,13 @@ endef
 autoconf_UNPACK = $(generic_UNPACK)
 define autoconf_BUILD
 # autoconf_BUILD PACKAGE=$(1) ARCH=$(2)
-build/$(1)/$(2)/.build-stamp:
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp:
 	cd $$(dir $$@) && ./configure --host=$(2) \
-		CPPFLAGS="-I$(PWD)/target/include" \
+		CPPFLAGS="-I$(BC_ROOT)/target/include" \
 		CFLAGS="$(strip $(if $(findstring x86_64,$(2)),-m64,-m32) $($(1)_CFLAGS) $($(1)_$(2)_CFLAGS))" \
-		PKG_CONFIG_PATH=$(PWD)/target/lib/$(2)/pkgconfig \
+		PKG_CONFIG_PATH=$(BC_ROOT)/target/lib/$(2)/pkgconfig \
 		$($(1)_BUILDFLAGS) $($(1)_$(2)_BUILDFLAGS) \
-		--prefix=$(PWD)/target \
+		--prefix=$(BC_ROOT)/target \
 		--includedir='$$$$(prefix)/include' \
 		--mandir='$$$$(prefix)/share/man' \
 		--infodir='$$$$(prefix)/share/info' \
@@ -130,8 +148,8 @@ build/$(1)/$(2)/.build-stamp:
 endef
 define autoconf_INSTALL
 # autoconf_INSTALL PACKAGE=$(1) ARCH=$(2)
-build/$(1)/$(2)/.install-stamp:
-	$(MAKE) -C build/$(1)/$(2)/ install prefix=$(PWD)/target
+$(BC_ROOT)/build/$(1)/$(2)/.install-stamp:
+	$(MAKE) -C $(BC_ROOT)/build/$(1)/$(2)/ install prefix=$(BC_ROOT)/target
 	touch $$@
 # END autoconf_INSTALL PACKAGE=$(1) ARCH=$(2)
 endef
@@ -153,20 +171,20 @@ CGO_CC=$(strip \
 
 define go_UNPACK
 # go_UNPACK PACKAGE=$(1) ARCH=$(2)
-build/$(1)/$(2)/.unpack-stamp:
-	mkdir -p build/$(1)/$(2)/src/$($(1)_NAMESPACE)
-	tar --strip=1 -xzf $($(1)_TARBALL) -C build/$(1)/$(2)/src/$($(1)_NAMESPACE)
+$(BC_ROOT)/build/$(1)/$(2)/.unpack-stamp:
+	mkdir -p $(BC_ROOT)/build/$(1)/$(2)/src/$($(1)_NAMESPACE)
+	tar --strip=1 -xzf $($(1)_TARBALL) -C $(BC_ROOT)/build/$(1)/$(2)/src/$($(1)_NAMESPACE)
 	$(foreach patch,$(sort $(wildcard patches/$(1)/$($(1)_VERSION)/*.patch)),\
-		patch -d build/$(1)/$(2)/src/$($(1)_NAMESPACE) -p1 < $(patch))
+		patch -d $(BC_ROOT)/build/$(1)/$(2)/src/$($(1)_NAMESPACE) -p1 < $(patch))
 	touch $$@
 # END go_UNPACK PACKAGE=$(1) ARCH=$(2)
 endef
 define go_BUILD
 # go_BUILD PACKAGE=$(1) ARCH=$(2)
-build/$(1)/$(2)/.build-stamp:
-	cd build/$(1)/$(2)/ && \
-		CGO_CFLAGS=-I$(PWD)/target/include \
-		CGO_LDFLAGS=-L$(PWD)/target/lib/$(2) \
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp:
+	cd $(BC_ROOT)/build/$(1)/$(2)/ && \
+		CGO_CFLAGS=-I$(BC_ROOT)/target/include \
+		CGO_LDFLAGS=-L$(BC_ROOT)/target/lib/$(2) \
 		GOPATH=$(PWD)/build/$(1)/$(2) \
 		GOOS=$(call GOOS,$(2)) GOARCH=$(call GOARCH,$(2)) \
 		CC=$(call CGO_CC,$(2)) \
@@ -177,9 +195,9 @@ build/$(1)/$(2)/.build-stamp:
 endef
 define go_INSTALL
 # go_INSTALL PACKAGE=$(1) ARCH=$(2)
-build/$(1)/$(2)/.install-stamp:
-	mkdir -p $(PWD)/target/lib/go
-	cp -urt $(PWD)/target/lib/go/ build/$(1)/$(2)/pkg build/$(1)/$(2)/src
+$(BC_ROOT)/build/$(1)/$(2)/.install-stamp:
+	mkdir -p $(BC_ROOT)/target/lib/go
+	cp -urt $(BC_ROOT)/target/lib/go/ build/$(1)/$(2)/pkg $(BC_ROOT)/build/$(1)/$(2)/src
 	touch $$@
 # END go_INSTALL PACKAGE=$(1) ARCH=$(2)
 endef
@@ -187,9 +205,9 @@ endef
 # END OF BUILD SYSTEM-SPECIFIC TEMPLATES
 
 # This puts everything together:
-$(foreach pkg,$(PACKAGES),\
+$(foreach pkg,$(BC_PACKAGES),\
 	$(eval $(call GEN_INDEP_TEMPLATE,$(pkg))) \
-	$(foreach arch,$(ARCHS),\
+	$(foreach arch,$(BC_ARCHS),\
 		$(eval $(call GEN_ARCH_TEMPLATE,$(pkg),$(arch)))))
 
 # For debugging purposes:
@@ -197,10 +215,26 @@ define DUMPHEADER
 # AUTOMATICALLY GENERATED RULES
 # =============================
 endef
-dump:
+BC/dump:
 	$(info $(DUMPHEADER))
-	$(foreach pkg,$(PACKAGES),\
+	$(foreach pkg,$(BC_PACKAGES),\
 		$(info $(call GEN_INDEP_TEMPLATE,$(pkg))) \
-		$(foreach arch,$(ARCHS),\
+		$(foreach arch,$(BC_ARCHS),\
 			$(info $(call GEN_ARCH_TEMPLATE,$(pkg),$(arch)))))
 	@true
+
+ifneq (,$(BC_IMPORT))
+# Make targets from BC/ "namespace" accessible
+$(foreach target,\
+	download unpack build install clean clear-install bleach dump,\
+	$(eval $(target): BC/$(target)))
+$(foreach target,\
+	download unpack build install clean,\
+	$(foreach package,$(PACKAGES),\
+		$(eval $(target)/$(package): BC/$(target)/$(package))))
+$(foreach target,\
+	build install clean,\
+	$(foreach package,$(PACKAGES),\
+		$(foreach arch,$(ARCHS),\
+			$(eval $(target)/$(package)/$(arch): BC/$(target)/$(package)/$(arch)))))
+endif
