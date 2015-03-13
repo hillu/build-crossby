@@ -34,7 +34,7 @@ define GEN_INDEP_TEMPLATE
 # DOWNLOAD $(1)
 $(1)_TARBALL = $(BC_ROOT)/cache/$(1)-$($(1)_VERSION)$($(1)_SUFFIX)
 $$($(1)_TARBALL):
-	mkdir -p $(dirname $$@)
+	mkdir -p $$(dir $$@)
 	wget -c -O $$@.t $($(1)_URL)
 	mv $$@.t $$@
 
