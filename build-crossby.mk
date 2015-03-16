@@ -185,7 +185,7 @@ $(BC_ROOT)/build/$(1)/$(2)/.build-stamp:
 	cd $(BC_ROOT)/build/$(1)/$(2)/ && \
 		CGO_CFLAGS=-I$(BC_ROOT)/target/include \
 		CGO_LDFLAGS=-L$(BC_ROOT)/target/lib/$(2) \
-		GOPATH=$(PWD)/build/$(1)/$(2) \
+		GOPATH=$(BC_ROOT)/build/$(1)/$(2) \
 		GOOS=$(call GOOS,$(2)) GOARCH=$(call GOARCH,$(2)) \
 		CC=$(call CGO_CC,$(2)) \
 		CGO_ENABLED=1 \
@@ -197,7 +197,7 @@ define go_INSTALL
 # go_INSTALL PACKAGE=$(1) ARCH=$(2)
 $(BC_ROOT)/build/$(1)/$(2)/.install-stamp:
 	mkdir -p $(BC_ROOT)/target/lib/go
-	cp -urt $(BC_ROOT)/target/lib/go/ build/$(1)/$(2)/pkg $(BC_ROOT)/build/$(1)/$(2)/src
+	cp -urt $(BC_ROOT)/target/lib/go/ $(BC_ROOT)build/$(1)/$(2)/pkg $(BC_ROOT)/build/$(1)/$(2)/src
 	touch $$@
 # END go_INSTALL PACKAGE=$(1) ARCH=$(2)
 endef
