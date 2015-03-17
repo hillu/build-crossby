@@ -113,7 +113,8 @@ define generic_UNPACK
 $(BC_ROOT)/build/$(1)/$(2)/.unpack-stamp:
 	mkdir -p $$(dir $$@)
 	tar --strip=1 -xzf $($(1)_TARBALL) -C $$(dir $$@)
-	$(foreach patch,$(sort $(wildcard patches/$(1)/$($(1)_VERSION)/*.patch)),\
+	$(foreach patch,$(sort $(wildcard $(BC_ROOT)/patches/$(1)/*.patch)) \
+			$(sort $(wildcard $(BC_ROOT)/patches/$(1)/$($(1)_VERSION)/*.patch)),\
 		patch -d $$(dir $$@) -p1 < $(patch))
 ifneq ($($(1)_POSTUNPACK),)
 	cd $$(dir $$@) && $($(1)_POSTUNPACK)
