@@ -182,14 +182,19 @@ $(BC_ROOT)/build/$(1)/$(2)/.unpack-stamp:
 endef
 define go_BUILD
 # go_BUILD PACKAGE=$(1) ARCH=$(2)
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_CFLAGS=-I$(BC_ROOT)/target/include
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_CFLAGS+=$($(1)_CGO_CFLAGS)
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_CFLAGS+=$($(1)_$(2)_CGO_CFLAGS)
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_LDFLAGS=-L$(BC_ROOT)/target/lib/$(2)
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_LDFLAGS+=$($(1)_CGO_LDFLAGS)
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_LDFLAGS+=$($(1)_$(2)_CGO_LDFLAGS)
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export GOPATH=$(BC_ROOT)/build/$(1)/$(2)
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export GOOS=$(call GOOS,$(2))
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export GOARCH=$(call GOARCH,$(2))
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CC=$(call CGO_CC,$(2))
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_ENABLED=1
 $(BC_ROOT)/build/$(1)/$(2)/.build-stamp:
 	cd $(BC_ROOT)/build/$(1)/$(2)/ && \
-		CGO_CFLAGS=-I$(BC_ROOT)/target/include \
-		CGO_LDFLAGS=-L$(BC_ROOT)/target/lib/$(2) \
-		GOPATH=$(BC_ROOT)/build/$(1)/$(2) \
-		GOOS=$(call GOOS,$(2)) GOARCH=$(call GOARCH,$(2)) \
-		CC=$(call CGO_CC,$(2)) \
-		CGO_ENABLED=1 \
 		go install -x --ldflags '-extldflags "-static"' $($(1)_NAMESPACE)
 	touch $$@
 # END go_BUILD PACKAGE=$(1) ARCH=$(2)
