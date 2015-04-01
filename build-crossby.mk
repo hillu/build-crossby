@@ -24,7 +24,7 @@ BC_ARCHS    ?= x86_64-linux-gnu i386-linux-gnu i686-w64-mingw32 x86_64-w64-mingw
 BC_PACKAGES ?= $(patsubst %.mk,%,$(notdir $(wildcard $(BC_ROOT)/package/*.mk)))
 BC_IMPORT   ?=
 
-include $(BC_ROOT)/$(BC_PROJECT).mk
+-include $(BC_ROOT)/$(BC_PROJECT).mk
 $(foreach pkg,$(BC_PACKAGES),$(eval include $(BC_ROOT)/package/$(pkg).mk))
 
 # GENERIC TOP-LEVEL TEMPLATES
