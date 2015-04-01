@@ -175,7 +175,8 @@ define go_UNPACK
 $(BC_ROOT)/build/$(1)/$(2)/.unpack-stamp:
 	mkdir -p $(BC_ROOT)/build/$(1)/$(2)/src/$($(1)_NAMESPACE)
 	tar --strip=1 -xzf $($(1)_TARBALL) -C $(BC_ROOT)/build/$(1)/$(2)/src/$($(1)_NAMESPACE)
-	$(foreach patch,$(sort $(wildcard patches/$(1)/$($(1)_VERSION)/*.patch)),\
+	$(foreach patch,$(sort $(wildcard $(BC_ROOT)/patches/$(1)/*.patch)) \
+			$(sort $(wildcard $(BC_ROOT)/patches/$(1)/$($(1)_VERSION)/*.patch)),\
 		patch -d $(BC_ROOT)/build/$(1)/$(2)/src/$($(1)_NAMESPACE) -p1 < $(patch))
 	touch $$@
 # END go_UNPACK PACKAGE=$(1) ARCH=$(2)
