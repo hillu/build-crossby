@@ -196,7 +196,7 @@ $(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CC=$(call CGO_CC,$(2))
 $(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_ENABLED=1
 $(BC_ROOT)/build/$(1)/$(2)/.build-stamp:
 	cd $(BC_ROOT)/build/$(1)/$(2)/ && \
-		go install -x --ldflags '-extldflags "-static"' $($(1)_NAMESPACE)
+		go install -x --ldflags '-extldflags "-static"' $($(1)_NAMESPACE)...
 	touch $$@
 # END go_BUILD PACKAGE=$(1) ARCH=$(2)
 endef
