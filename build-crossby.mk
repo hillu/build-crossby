@@ -209,7 +209,7 @@ define go_INSTALL
 # go_INSTALL PACKAGE=$(1) ARCH=$(2)
 $(BC_ROOT)/build/$(1)/$(2)/.install-stamp:
 	mkdir -p $(BC_ROOT)/target/lib/go
-	cp -urt $(BC_ROOT)/target/lib/go/ $(BC_ROOT)/build/$(1)/$(2)/pkg $(BC_ROOT)/build/$(1)/$(2)/src
+	cp -furt $(BC_ROOT)/target/lib/go/ $(BC_ROOT)/build/$(1)/$(2)/pkg $(BC_ROOT)/build/$(1)/$(2)/src
 	mkdir -p $(BC_ROOT)/target/bin/$(2)
 # FIXME: Add a function to filter-out filenames
 	$$(foreach binary,\
@@ -217,7 +217,7 @@ $(BC_ROOT)/build/$(1)/$(2)/.install-stamp:
 			$(BC_ROOT)/build/$(1)/$(2)/bin/$(call GOOS,$(2))_$(call GOARCH,$(2)_)/*),\
 		if test -f $$(binary); then \
 			install -m755 $$(binary) $(BC_ROOT)/target/bin/$(2);\
-		fi)
+		fi;)
 	touch $$@
 # END go_INSTALL PACKAGE=$(1) ARCH=$(2)
 endef
