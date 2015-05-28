@@ -21,6 +21,7 @@
 BC_ROOT     ?= $(PWD)
 BC_PROJECT  ?= default
 BC_ARCHS    ?= x86_64-linux-gnu i386-linux-gnu i686-w64-mingw32 x86_64-w64-mingw32
+BC_PRIMARY_ARCH ?= $(shell gcc -print-multiarch) # FIXME: Is there a better way?
 BC_PACKAGES ?= $(patsubst %.mk,%,$(notdir $(wildcard $(BC_ROOT)/package/*.mk)))
 BC_IMPORT   ?=
 
@@ -98,6 +99,10 @@ BC/clean: BC/clean/$(1)/$(2)
 
 endef
 
+BC/install:
+	for binary in $(BC_ROOT)/target/bin/$(BC_PRIMARY_ARCH)/*; do \
+		test -f $$binary && cp -sft $(BC_ROOT)/target/bin $$binary; \
+	done
 BC/clear-install:
 	rm -rf $(BC_ROOT)/target
 BC/bleach: BC/clean BC/clear-install
