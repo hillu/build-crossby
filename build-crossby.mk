@@ -21,7 +21,8 @@
 BC_ROOT     ?= $(PWD)
 BC_PROJECT  ?= default
 BC_ARCHS    ?= x86_64-linux-gnu i386-linux-gnu i686-w64-mingw32 x86_64-w64-mingw32
-BC_PRIMARY_ARCH ?= $(shell gcc -print-multiarch) # FIXME: Is there a better way?
+# FIXME: Is there a better way?
+BC_PRIMARY_ARCH ?= $(shell gcc -print-multiarch)
 BC_PACKAGES ?= $(patsubst %.mk,%,$(notdir $(wildcard $(BC_ROOT)/package/*.mk)))
 BC_IMPORT   ?=
 
