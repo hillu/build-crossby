@@ -157,6 +157,12 @@ define autoconf_INSTALL
 # autoconf_INSTALL PACKAGE=$(1) ARCH=$(2)
 $(BC_ROOT)/build/$(1)/$(2)/.install-stamp:
 	$(MAKE) -C $(BC_ROOT)/build/$(1)/$(2)/ install prefix=$(BC_ROOT)/target
+ifneq ($($(1)_POSTINSTALL),)
+	cd $$(dir $$@) && $($(1)_POSTINSTALL)
+endif
+ifneq ($($(1)_$(2)_POSTINSTALL),)
+	cd $$(dir $$@) && $($(1)_$(2)_POSTINSTALL)
+endif
 	touch $$@
 # END autoconf_INSTALL PACKAGE=$(1) ARCH=$(2)
 endef
