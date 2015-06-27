@@ -69,6 +69,7 @@ $(BC_ROOT)/build/$(1)/$(2)/.build-stamp: $(patsubst %,$(BC_ROOT)/build/%/$(2)/.i
 # BUILD PACKAGE=$(1) ARCH=$(2)
 $(call $($(1)_BUILDSYSTEM)_BUILD,$(1),$(2))
 
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export PATH=$(PATH):$(BC_ROOT)/target/bin
 $(BC_ROOT)/build/$(1)/$(2)/.build-stamp: $(BC_ROOT)/build/$(1)/$(2)/.unpack-stamp
 BC/build/$(1)/$(2): $(BC_ROOT)/build/$(1)/$(2)/.build-stamp
 BC/build/$(1): BC/build/$(1)/$(2)
@@ -79,6 +80,7 @@ BC/build: BC/build/$(1)/$(2)
 # INSTALL PACKAGE=$(1) ARCH=$(2)
 $(call $($(1)_BUILDSYSTEM)_INSTALL,$(1),$(2))
 
+$(BC_ROOT)/build/$(1)/$(2)/.install-stamp: export PATH=$(PATH):$(BC_ROOT)/target/bin
 $(BC_ROOT)/build/$(1)/$(2)/.install-stamp: $(BC_ROOT)/build/$(1)/$(2)/.build-stamp
 BC/install/$(1)/$(2): $(BC_ROOT)/build/$(1)/$(2)/.install-stamp
 BC/install/$(1): BC/install/$(1)/$(2)
