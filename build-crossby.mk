@@ -63,7 +63,7 @@ BC/unpack: BC/unpack/$(1)/$(2)
 # END UNPACK PACKAGE=$(1) ARCH=$(2)
 
 # DEPENDENCIES $(1) $($(1)_DEPENDS)
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: $(patsubst %,$(BC_ROOT)/build/%/$(2)/.install-stamp,$($(1)_DEPENDS))
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: $(patsubst %,$(BC_ROOT)/build/%/$(2)/.install-stamp,$($(1)_DEPENDS) $($(1)_$(2)_DEPENDS))
 # END DEPENDENCIES
 
 # BUILD PACKAGE=$(1) ARCH=$(2)
