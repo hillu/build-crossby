@@ -120,7 +120,13 @@ define generic_UNPACK
 # generic_UNPACK PACKAGE=$(1) ARCH=$(2)
 $(BC_ROOT)/build/$(1)/$(2)/.unpack-stamp:
 	mkdir -p $$(dir $$@)
+ifeq ($($(1)_SUFFIX),.tar.gz)
 	tar --strip=1 -xzf $($(1)_TARBALL) -C $$(dir $$@)
+else ifeq ($($(1)_SUFFIX),.tar.bz2)
+	tar --strip=1 -xjf $($(1)_TARBALL) -C $$(dir $$@)
+else ifeq ($($(1)_SUFFIX),.tar.xz)
+	tar --strip=1 -xJf $($(1)_TARBALL) -C $$(dir $$@)
+endif
 	$(foreach patch,$(sort $(wildcard $(BC_ROOT)/patches/$(1)/*.patch)) \
 			$(sort $(wildcard $(BC_ROOT)/patches/$(1)/$($(1)_VERSION)/*.patch)),\
 		patch -d $$(dir $$@) -p1 < $(patch))
