@@ -137,6 +137,35 @@ endif
 # END generic_UNPACK PACKAGE=$(1) ARCH=$(2)
 endef
 
+# Make
+make_UNPACK = $(generic_UNPACK)
+define make_BUILD
+# make_BUILD PACKAGE=$(1) ARCH=$(2)
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp:
+	$(foreach tgt,$(or $(strip $($(1)_$(2)_BUILDTARGETS) $($(1)_BUILDTARGETS)),all),\
+	make -C $(BC_ROOT)/build/$(1)/$(2)/ \
+		$($(1)_BUILDFLAGS) $($(1)_$(2)_BUILDFLAGS) \
+		$(tgt) && ) true
+	touch $$@
+# END autoconf_BUILD PACKAGE=$(1) ARCH=$(2)
+endef
+define make_INSTALL
+# make_INSTALL PACKAGE=$(1) ARCH=$(2)
+$(BC_ROOT)/build/$(1)/$(2)/.install-stamp:
+	$(foreach tgt,$(or $(strip $($(1)_$(2)_INSTALLTARGETS) $($(1)_INSTALLTARGETS)),install),\
+		$(MAKE) -C $(BC_ROOT)/build/$(1)/$(2)/ \
+			$($(1)_INSTALLFLAGS) $($(1)_$(2)_INSTALLFLAGS) \
+			$(tgt))
+ifneq ($($(1)_POSTINSTALL),)
+	cd $$(dir $$@) && $($(1)_POSTINSTALL)
+endif
+ifneq ($($(1)_$(2)_POSTINSTALL),)
+	cd $$(dir $$@) && $($(1)_$(2)_POSTINSTALL)
+endif
+	touch $$@
+# END make_INSTALL PACKAGE=$(1) ARCH=$(2)
+endef
+
 # Autoconf
 autoconf_UNPACK = $(generic_UNPACK)
 define autoconf_BUILD
