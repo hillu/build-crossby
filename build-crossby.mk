@@ -206,7 +206,7 @@ endef
 
 # Golang
 GOOS=$(strip \
-    $(if $(filter %-linux-gnu,$(1)),linux,\
+    $(if $(findstring -linux-,$(1)),linux,\
         $(if $(filter %-w64-% %-mingw32,$(1)),windows,\
             $(error GOOS: unrecognized architecture $(1)))))
 
@@ -216,8 +216,8 @@ GOARCH=$(strip \
             $(error GOARCH: unrecognized architecture $(1)))))
 
 CGO_CC=$(strip \
-    $(if $(filter %w64-mingw32,$(1)),\
-        $(1)-gcc,gcc))
+    $(if $(filter %-linux-gnu,$(1)),\
+        gcc,$(1)-gcc))
 
 define go_UNPACK
 # go_UNPACK PACKAGE=$(1) ARCH=$(2)
