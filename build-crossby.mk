@@ -271,8 +271,11 @@ endef
 # This puts everything together:
 $(foreach pkg,$(BC_PACKAGES),\
 	$(eval $(call GEN_INDEP_TEMPLATE,$(pkg))) \
-	$(foreach arch,$(BC_ARCHS),\
-		$(eval $(call GEN_ARCH_TEMPLATE,$(pkg),$(arch)))))
+	$(if $($(pkg)_ARCHS),\
+		$(foreach arch,$($(pkg)_ARCHS),\
+			$(eval $(call GEN_ARCH_TEMPLATE,$(pkg),$(arch)))),\
+		$(foreach arch,$(BC_ARCHS),\
+			$(eval $(call GEN_ARCH_TEMPLATE,$(pkg),$(arch))))))
 
 # For debugging purposes:
 define DUMPHEADER
