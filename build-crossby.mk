@@ -25,6 +25,7 @@ BC_ARCHS    ?= x86_64-linux-gnu i386-linux-gnu i686-w64-mingw32 x86_64-w64-mingw
 BC_PRIMARY_ARCH ?= $(shell gcc -print-multiarch)
 BC_PACKAGES ?= $(patsubst %.mk,%,$(notdir $(wildcard $(BC_ROOT)/package/*.mk)))
 BC_IMPORT   ?=
+GOROOT      ?= $(shell go env GOROOT)
 
 -include $(BC_ROOT)/$(BC_PROJECT).mk
 $(foreach pkg,$(BC_PACKAGES),$(eval include $(BC_ROOT)/package/$(pkg).mk))
@@ -247,7 +248,7 @@ $(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CC=$(call CGO_CC,$(2))
 $(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_ENABLED=1
 $(BC_ROOT)/build/$(1)/$(2)/.build-stamp:
 	cd $(BC_ROOT)/build/$(1)/$(2)/ && \
-		go install -x --ldflags '-extldflags "-static"' $($(1)_NAMESPACE)...
+		$(GOROOT)/bin/go install -x --ldflags '-extldflags "-static"' $($(1)_NAMESPACE)...
 	touch $$@
 # END go_BUILD PACKAGE=$(1) ARCH=$(2)
 endef
