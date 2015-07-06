@@ -232,7 +232,7 @@ $(BC_ROOT)/build/$(1)/$(2)/.unpack-stamp:
 endef
 define go_BUILD
 # go_BUILD PACKAGE=$(1) ARCH=$(2)
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_CFLAGS=-I$(BC_ROOT)/target/include
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_CFLAGS=-I$(BC_ROOT)/target/include/$(2)
 $(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_CFLAGS+=$($(1)_CGO_CFLAGS)
 $(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_CFLAGS+=$($(1)_$(2)_CGO_CFLAGS)
 $(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_LDFLAGS=-L$(BC_ROOT)/target/lib/$(2)
