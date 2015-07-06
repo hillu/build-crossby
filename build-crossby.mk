@@ -104,7 +104,9 @@ endef
 
 BC/install:
 	for binary in $(BC_ROOT)/target/bin/$(BC_PRIMARY_ARCH)/*; do \
-		test -f $$binary && cp -sft $(BC_ROOT)/target/bin $$binary; \
+		test -f $$binary && \
+		cp -sft $(BC_ROOT)/target/bin $$binary || \
+		true; \
 	done
 BC/clear-install:
 	rm -rf $(BC_ROOT)/target
