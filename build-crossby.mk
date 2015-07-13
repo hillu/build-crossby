@@ -250,7 +250,7 @@ $(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_CFLAGS+=$($(1)_$(2)_CGO_CFLA
 $(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_LDFLAGS=-L$(BC_ROOT)/target/lib/$(2)
 $(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_LDFLAGS+=$($(1)_CGO_LDFLAGS)
 $(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_LDFLAGS+=$($(1)_$(2)_CGO_LDFLAGS)
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export GOPATH=$(BC_ROOT)/build/$(1)/$(2):$(BC_ROOT)/target/lib/go
+$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export GOPATH=$(BC_ROOT)/build/$(1)/$(2):$(BC_ROOT)/target/lib/$(2)/go
 $(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export GOOS=$(call GOOS,$(2))
 $(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export GOARCH=$(call GOARCH,$(2))
 $(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CC=$(call CGO_CC,$(2))
@@ -264,8 +264,8 @@ endef
 define go_INSTALL
 # go_INSTALL PACKAGE=$(1) ARCH=$(2)
 $(BC_ROOT)/build/$(1)/$(2)/.install-stamp:
-	mkdir -p $(BC_ROOT)/target/lib/go
-	cp -furt $(BC_ROOT)/target/lib/go/ $(BC_ROOT)/build/$(1)/$(2)/pkg $(BC_ROOT)/build/$(1)/$(2)/src
+	mkdir -p $(BC_ROOT)/target/lib/$(2)/go
+	cp -furt $(BC_ROOT)/target/lib/$(2)/go/ $(BC_ROOT)/build/$(1)/$(2)/pkg $(BC_ROOT)/build/$(1)/$(2)/src
 	mkdir -p $(BC_ROOT)/target/bin/$(2)
 # FIXME: Add a function to filter-out filenames
 	$$(foreach binary,\
