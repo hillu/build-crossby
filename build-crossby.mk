@@ -284,9 +284,9 @@ endef
 $(foreach pkg,$(BC_PACKAGES),\
 	$(eval $(call GEN_INDEP_TEMPLATE,$(pkg))) \
 	$(if $($(pkg)_ARCHS),\
-		$(foreach arch,$($(pkg)_ARCHS),\
+		$(foreach arch,$(sort $($(pkg)_ARCHS)),\
 			$(eval $(call GEN_ARCH_TEMPLATE,$(pkg),$(arch)))),\
-		$(foreach arch,$(BC_ARCHS),\
+		$(foreach arch,$(sort $(BC_ARCHS)),\
 			$(eval $(call GEN_ARCH_TEMPLATE,$(pkg),$(arch))))))
 
 # For debugging purposes:
