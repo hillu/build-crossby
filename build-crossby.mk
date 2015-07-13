@@ -182,8 +182,8 @@ define autoconf_BUILD
 $(BC_ROOT)/build/$(1)/$(2)/.build-stamp:
 	cd $$(dir $$@) && ./configure \
 		--host=$(call BC_autoconf_HOST,$(2)) \
-		CC=$(call BC_autoconf_CC,$(2)) \
-		CXX=$(call BC_autoconf_CXX,$(2)) \
+		CC=$$(call BC_autoconf_CC,$(2)) \
+		CXX=$$(call BC_autoconf_CXX,$(2)) \
 		CPPFLAGS="-I$(BC_ROOT)/target/include/$(2)" \
 		CFLAGS="$(strip $(if $(findstring x86_64,$(2)),-m64,-m32) $($(1)_CFLAGS) $($(1)_$(2)_CFLAGS))" \
 		PKG_CONFIG_PATH=$(BC_ROOT)/target/lib/$(2)/pkgconfig \
