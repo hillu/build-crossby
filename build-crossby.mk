@@ -169,12 +169,21 @@ endif
 # END make_INSTALL PACKAGE=$(1) ARCH=$(2)
 endef
 
+# autoconf usually does not recognize *-linux-musl
+BC_autoconf_HOST = $(patsubst %-musl,%-gnu,$(1))
+# Use <triplet>-gcc if available, gcc otherwise
+BC_autoconf_CC   = $(or $(shell PATH=$(PATH) which $(1)-gcc),gcc)
+BC_autoconf_CXX  = $(or $(shell PATH=$(PATH) which $(1)-g++),g++)
+
 # Autoconf
 autoconf_UNPACK = $(generic_UNPACK)
 define autoconf_BUILD
 # autoconf_BUILD PACKAGE=$(1) ARCH=$(2)
 $(BC_ROOT)/build/$(1)/$(2)/.build-stamp:
-	cd $$(dir $$@) && ./configure --host=$(2) \
+	cd $$(dir $$@) && ./configure \
+		--host=$(call BC_autoconf_HOST,$(2)) \
+		CC=$(call BC_autoconf_CC,$(2)) \
+		CXX=$(call BC_autoconf_CXX,$(2)) \
 		CPPFLAGS="-I$(BC_ROOT)/target/include/$(2)" \
 		CFLAGS="$(strip $(if $(findstring x86_64,$(2)),-m64,-m32) $($(1)_CFLAGS) $($(1)_$(2)_CFLAGS))" \
 		PKG_CONFIG_PATH=$(BC_ROOT)/target/lib/$(2)/pkgconfig \
