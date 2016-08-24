@@ -132,7 +132,7 @@ else ifeq ($($(1)_SUFFIX),.tar.xz)
 endif
 	$(foreach patch,$(sort $(wildcard $(BC_ROOT)/patches/$(1)/*.patch)) \
 			$(sort $(wildcard $(BC_ROOT)/patches/$(1)/$($(1)_VERSION)/*.patch)),\
-		patch -d $$(dir $$@) -p1 < $(patch))
+		patch -d $$(dir $$@) -p1 < $(patch) && ) true
 ifneq ($($(1)_POSTUNPACK),)
 	cd $$(dir $$@) && $($(1)_POSTUNPACK)
 endif
