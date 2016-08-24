@@ -23,7 +23,8 @@ Assumptions
 
 - Source code is readily available for automated download via the
   network (i.e. tarballs from git commits by tag, branch, or hash),
-  but it should be cached locally.
+  but it should be cached locally. Source tarballs can also be stored
+  in a `tarballs/` subdirectory.
 
 - Even though make has a reputation for quirky syntax, its general
   approach based upon targets, prerequisites, recipies should be
@@ -105,7 +106,7 @@ must be implemented:
 License
 -------
 
-Copyright (C) 2015  Hilko Bengen <bengen@hilluzination.de>
+Copyright (C) 2015, 2016  Hilko Bengen <bengen@hilluzination.de>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

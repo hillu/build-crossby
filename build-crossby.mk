@@ -36,10 +36,15 @@ $(foreach pkg,$(BC_PACKAGES),$(eval include $(BC_ROOT)/package/$(pkg).mk))
 define GEN_INDEP_TEMPLATE
 # DOWNLOAD $(1)
 $(1)_TARBALL = $(BC_ROOT)/cache/$(1)-$($(1)_VERSION)$($(1)_SUFFIX)
+$(1)_TARBALL_LOCAL = $(BC_ROOT)/tarballs/$(1)-$($(1)_VERSION)$($(1)_SUFFIX)
 $$($(1)_TARBALL):
 	mkdir -p $$(dir $$@)
-	wget -c -O $$@.t $($(1)_URL)
-	mv $$@.t $$@
+	if test -e $$($(1)_TARBALL_LOCAL); \
+	then \
+		cp -u $$($(1)_TARBALL_LOCAL) $$($(1)_TARBALL); \
+	else \
+		wget -c -O $$@.t $($(1)_URL) && mv $$@.t $$@; \
+	fi
 
 BC/download/$(1): $$($(1)_TARBALL)
 BC/download: BC/download/$(1)
@@ -317,3 +322,12 @@ $(foreach target,\
 		$(foreach arch,$(ARCHS),\
 			$(eval $(target)/$(package)/$(arch): BC/$(target)/$(package)/$(arch)))))
 endif
+
+.PHONY: BC/download-instructions
+
+BC/download-instructions:
+	$(info The following commands can be used to pre-download files needed in)
+	$(info $(BC_ROOT)/cache :)
+	$(foreach pkg,$(BC_PACKAGES),\
+		$(info wget -O- $($(pkg)_URL) > $($(pkg)_TARBALL_LOCAL)))
+	@true
