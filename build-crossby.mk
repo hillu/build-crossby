@@ -61,23 +61,23 @@ define _GEN_ARCH_TEMPLATE
 # UNPACK PACKAGE=$(1) ARCH=$(2)
 $(call $($(1)_BUILDSYSTEM)_UNPACK,$(1),$(2))
 
-$(BC_ROOT)/build/$(1)/$(2)/.unpack-stamp: $($(1)_TARBALL)
-BC/unpack/$(1)/$(2): $(BC_ROOT)/build/$(1)/$(2)/.unpack-stamp
+$(BC_ROOT)/stamps/unpack-$(1)-$(2): $($(1)_TARBALL)
+BC/unpack/$(1)/$(2): $(BC_ROOT)/stamps/unpack-$(1)-$(2)
 BC/unpack/$(1): BC/unpack/$(1)/$(2)
 BC/unpack: BC/unpack/$(1)/$(2)
 .PHONY: BC/unpack/$(1) BC/unpack/$(1)/$(2)
 # END UNPACK PACKAGE=$(1) ARCH=$(2)
 
 # DEPENDENCIES $(1) $($(1)_DEPENDS)
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: $(patsubst %,$(BC_ROOT)/build/%/$(2)/.install-stamp,$($(1)_DEPENDS) $($(1)_$(2)_DEPENDS))
+$(BC_ROOT)/stamps/build-$(1)-$(2): $(patsubst %,$(BC_ROOT)/stamps/install-%/$(2),$($(1)_DEPENDS) $($(1)_$(2)_DEPENDS))
 # END DEPENDENCIES
 
 # BUILD PACKAGE=$(1) ARCH=$(2)
 $(call $($(1)_BUILDSYSTEM)_BUILD,$(1),$(2))
 
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export PATH=$(PATH):$(BC_ROOT)/target/bin
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: $(BC_ROOT)/build/$(1)/$(2)/.unpack-stamp
-BC/build/$(1)/$(2): $(BC_ROOT)/build/$(1)/$(2)/.build-stamp
+$(BC_ROOT)/stamps/build-$(1)-$(2): export PATH=$(PATH):$(BC_ROOT)/target/bin
+$(BC_ROOT)/stamps/build-$(1)-$(2): $(BC_ROOT)/stamps/unpack-$(1)-$(2)
+BC/build/$(1)/$(2): $(BC_ROOT)/stamps/build-$(1)-$(2)
 BC/build/$(1): BC/build/$(1)/$(2)
 BC/build: BC/build/$(1)/$(2)
 .PHONY: BC/build/$(1) BC/build/$(1)/$(2)
@@ -86,13 +86,13 @@ BC/build: BC/build/$(1)/$(2)
 # INSTALL PACKAGE=$(1) ARCH=$(2)
 $(call $($(1)_BUILDSYSTEM)_INSTALL,$(1),$(2))
 
-$(BC_ROOT)/build/$(1)/$(2)/.install-stamp: export PATH=$(PATH):$(BC_ROOT)/target/bin
-$(BC_ROOT)/build/$(1)/$(2)/.install-stamp: $(BC_ROOT)/build/$(1)/$(2)/.build-stamp
-BC/install/$(1)/$(2): $(BC_ROOT)/build/$(1)/$(2)/.install-stamp
+$(BC_ROOT)/stamps/install-$(1)-$(2): export PATH=$(PATH):$(BC_ROOT)/target/bin
+$(BC_ROOT)/stamps/install-$(1)-$(2): $(BC_ROOT)/stamps/build-$(1)-$(2)
+BC/install/$(1)/$(2): $(BC_ROOT)/stamps/install-$(1)-$(2)
 BC/install/$(1): BC/install/$(1)/$(2)
 BC/install: BC/install/$(1)/$(2)
 BC/clear-install/$(1)/$(2):
-	rm -f $(BC_ROOT)/build/$(1)/$(2)/.install-stamp
+	rm -f $(BC_ROOT)/stamps/install-$(1)-$(2)
 BC/clear-install: BC/clear-install/$(1)/$(2)
 .PHONY: BC/install/$(1)/$(2) BC/clear-install/$(1)/$(2)
 # END INSTALL PACKAGE=$(1) ARCH=$(2)
@@ -126,22 +126,22 @@ BC/bleach: BC/clean BC/clear-install
 
 define generic_UNPACK
 # generic_UNPACK PACKAGE=$(1) ARCH=$(2)
-$(BC_ROOT)/build/$(1)/$(2)/.unpack-stamp:
-	mkdir -p $$(dir $$@)
+$(BC_ROOT)/stamps/unpack-$(1)-$(2):
+	mkdir -p $(BC_ROOT)/build/$(1)-$(2)
 ifeq ($($(1)_SUFFIX),.tar.gz)
-	tar --strip=1 -xzf $($(1)_TARBALL) -C $$(dir $$@)
+	tar --strip=1 -xzf $($(1)_TARBALL) -C $(BC_ROOT)/build/$(1)-$(2)
 else ifeq ($($(1)_SUFFIX),.tar.bz2)
-	tar --strip=1 -xjf $($(1)_TARBALL) -C $$(dir $$@)
+	tar --strip=1 -xjf $($(1)_TARBALL) -C $(BC_ROOT)/build/$(1)-$(2)
 else ifeq ($($(1)_SUFFIX),.tar.xz)
-	tar --strip=1 -xJf $($(1)_TARBALL) -C $$(dir $$@)
+	tar --strip=1 -xJf $($(1)_TARBALL) -C $(BC_ROOT)/build/$(1)-$(2)
 endif
 	$(foreach patch,$(sort $(wildcard $(BC_ROOT)/patches/$(1)/*.patch)) \
 			$(sort $(wildcard $(BC_ROOT)/patches/$(1)/$($(1)_VERSION)/*.patch)),\
-		patch -d $$(dir $$@) -p1 < $(patch) && ) true
+		patch -d $(BC_ROOT)/build/$(1)-$(2) -p1 < $(patch) && ) true
 ifneq ($($(1)_POSTUNPACK),)
-	cd $$(dir $$@) && $($(1)_POSTUNPACK)
+	cd $(BC_ROOT)/build/$(1)-$(2) && $($(1)_POSTUNPACK)
 endif
-	touch $$@
+	mkdir -p $$(dir $$@) && touch $$@
 # END generic_UNPACK PACKAGE=$(1) ARCH=$(2)
 endef
 
@@ -149,28 +149,28 @@ endef
 make_UNPACK = $(generic_UNPACK)
 define make_BUILD
 # make_BUILD PACKAGE=$(1) ARCH=$(2)
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp:
+$(BC_ROOT)/stamps/build-$(1)-$(2):
 	$(foreach tgt,$(or $(strip $($(1)_$(2)_BUILDTARGETS) $($(1)_BUILDTARGETS)),all),\
 	make -C $(BC_ROOT)/build/$(1)/$(2)/ \
 		$($(1)_BUILDFLAGS) $($(1)_$(2)_BUILDFLAGS) \
 		$(tgt) && ) true
-	touch $$@
+	mkdir -p $$(dir $$@) && touch $$@
 # END autoconf_BUILD PACKAGE=$(1) ARCH=$(2)
 endef
 define make_INSTALL
 # make_INSTALL PACKAGE=$(1) ARCH=$(2)
-$(BC_ROOT)/build/$(1)/$(2)/.install-stamp:
+$(BC_ROOT)/stamps/install-$(1)-$(2):
 	$(foreach tgt,$(or $(strip $($(1)_$(2)_INSTALLTARGETS) $($(1)_INSTALLTARGETS)),install),\
 		$(MAKE) -C $(BC_ROOT)/build/$(1)/$(2)/ \
 			$($(1)_INSTALLFLAGS) $($(1)_$(2)_INSTALLFLAGS) \
 			$(tgt))
 ifneq ($($(1)_POSTINSTALL),)
-	cd $$(dir $$@) && $($(1)_POSTINSTALL)
+	cd $(BC_ROOT)/build/$(1)-$(2) && $($(1)_POSTINSTALL)
 endif
 ifneq ($($(1)_$(2)_POSTINSTALL),)
-	cd $$(dir $$@) && $($(1)_$(2)_POSTINSTALL)
+	cd $(BC_ROOT)/build/$(1)-$(2) && $($(1)_$(2)_POSTINSTALL)
 endif
-	touch $$@
+	mkdir -p $$(dir $$@) && touch $$@
 # END make_INSTALL PACKAGE=$(1) ARCH=$(2)
 endef
 
@@ -184,8 +184,8 @@ BC_autoconf_CXX  = $(or $(shell PATH=$(PATH) which $(1)-g++),g++)
 autoconf_UNPACK = $(generic_UNPACK)
 define autoconf_BUILD
 # autoconf_BUILD PACKAGE=$(1) ARCH=$(2)
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp:
-	cd $$(dir $$@) && ./configure \
+$(BC_ROOT)/stamps/build-$(1)-$(2):
+	cd $(BC_ROOT)/build/$(1)-$(2) && ./configure \
 		--host=$$(call BC_autoconf_HOST,$(2)) \
 		CC=$$(call BC_autoconf_CC,$(2)) \
 		CXX=$$(call BC_autoconf_CXX,$(2)) \
@@ -203,21 +203,21 @@ $(BC_ROOT)/build/$(1)/$(2)/.build-stamp:
 		--bindir='$$$${prefix}/bin/$(2)' \
 		--sbindir='$$$${prefix}/sbin/$(2)'
 
-	$(MAKE) -C $$(dir $$@)
-	touch $$@
+	$(MAKE) -C $(BC_ROOT)/build/$(1)-$(2)
+	mkdir -p $$(dir $$@) && touch $$@
 # END autoconf_BUILD PACKAGE=$(1) ARCH=$(2)
 endef
 define autoconf_INSTALL
 # autoconf_INSTALL PACKAGE=$(1) ARCH=$(2)
-$(BC_ROOT)/build/$(1)/$(2)/.install-stamp:
+$(BC_ROOT)/stamps/install-$(1)-$(2):
 	$(MAKE) -C $(BC_ROOT)/build/$(1)/$(2)/ install prefix=$(BC_ROOT)/target
 ifneq ($($(1)_POSTINSTALL),)
-	cd $$(dir $$@) && $($(1)_POSTINSTALL)
+	cd $(BC_ROOT)/build/$(1)-$(2) && $($(1)_POSTINSTALL)
 endif
 ifneq ($($(1)_$(2)_POSTINSTALL),)
-	cd $$(dir $$@) && $($(1)_$(2)_POSTINSTALL)
+	cd $(BC_ROOT)/build/$(1)-$(2) && $($(1)_$(2)_POSTINSTALL)
 endif
-	touch $$@
+	mkdir -p $$(dir $$@) && touch $$@
 # END autoconf_INSTALL PACKAGE=$(1) ARCH=$(2)
 endef
 
@@ -238,37 +238,37 @@ CGO_CC=$(strip \
 
 define go_UNPACK
 # go_UNPACK PACKAGE=$(1) ARCH=$(2)
-$(BC_ROOT)/build/$(1)/$(2)/.unpack-stamp:
+$(BC_ROOT)/stamps/unpack-$(1)-$(2):
 	mkdir -p $(BC_ROOT)/build/$(1)/$(2)/src/$($(1)_NAMESPACE)
 	tar --strip=1 -xzf $($(1)_TARBALL) -C $(BC_ROOT)/build/$(1)/$(2)/src/$($(1)_NAMESPACE)
 	$(foreach patch,$(sort $(wildcard $(BC_ROOT)/patches/$(1)/*.patch)) \
 			$(sort $(wildcard $(BC_ROOT)/patches/$(1)/$($(1)_VERSION)/*.patch)),\
 		patch -d $(BC_ROOT)/build/$(1)/$(2)/src/$($(1)_NAMESPACE) -p1 < $(patch))
-	touch $$@
+	mkdir -p $$(dir $$@) && touch $$@
 # END go_UNPACK PACKAGE=$(1) ARCH=$(2)
 endef
 define go_BUILD
 # go_BUILD PACKAGE=$(1) ARCH=$(2)
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_CFLAGS=-I$(BC_ROOT)/target/include/$(2)
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_CFLAGS+=$($(1)_CGO_CFLAGS)
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_CFLAGS+=$($(1)_$(2)_CGO_CFLAGS)
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_LDFLAGS=-L$(BC_ROOT)/target/lib/$(2)
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_LDFLAGS+=$($(1)_CGO_LDFLAGS)
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_LDFLAGS+=$($(1)_$(2)_CGO_LDFLAGS)
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export GOPATH=$(BC_ROOT)/build/$(1)/$(2):$(BC_ROOT)/target/lib/$(2)/go
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export GOOS=$(call GOOS,$(2))
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export GOARCH=$(call GOARCH,$(2))
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CC=$(call CGO_CC,$(2))
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp: export CGO_ENABLED=1
-$(BC_ROOT)/build/$(1)/$(2)/.build-stamp:
+$(BC_ROOT)/stamps/build-$(1)-$(2): export CGO_CFLAGS=-I$(BC_ROOT)/target/include/$(2)
+$(BC_ROOT)/stamps/build-$(1)-$(2): export CGO_CFLAGS+=$($(1)_CGO_CFLAGS)
+$(BC_ROOT)/stamps/build-$(1)-$(2): export CGO_CFLAGS+=$($(1)_$(2)_CGO_CFLAGS)
+$(BC_ROOT)/stamps/build-$(1)-$(2): export CGO_LDFLAGS=-L$(BC_ROOT)/target/lib/$(2)
+$(BC_ROOT)/stamps/build-$(1)-$(2): export CGO_LDFLAGS+=$($(1)_CGO_LDFLAGS)
+$(BC_ROOT)/stamps/build-$(1)-$(2): export CGO_LDFLAGS+=$($(1)_$(2)_CGO_LDFLAGS)
+$(BC_ROOT)/stamps/build-$(1)-$(2): export GOPATH=$(BC_ROOT)/build/$(1)/$(2):$(BC_ROOT)/target/lib/$(2)/go
+$(BC_ROOT)/stamps/build-$(1)-$(2): export GOOS=$(call GOOS,$(2))
+$(BC_ROOT)/stamps/build-$(1)-$(2): export GOARCH=$(call GOARCH,$(2))
+$(BC_ROOT)/stamps/build-$(1)-$(2): export CC=$(call CGO_CC,$(2))
+$(BC_ROOT)/stamps/build-$(1)-$(2): export CGO_ENABLED=1
+$(BC_ROOT)/stamps/build-$(1)-$(2):
 	cd $(BC_ROOT)/build/$(1)/$(2)/ && \
 		$(GOROOT)/bin/go install -x --ldflags '-extldflags "-static"' $($(1)_NAMESPACE)...
-	touch $$@
+	mkdir -p $$(dir $$@) && touch $$@
 # END go_BUILD PACKAGE=$(1) ARCH=$(2)
 endef
 define go_INSTALL
 # go_INSTALL PACKAGE=$(1) ARCH=$(2)
-$(BC_ROOT)/build/$(1)/$(2)/.install-stamp:
+$(BC_ROOT)/stamps/install-$(1)-$(2):
 	mkdir -p $(BC_ROOT)/target/lib/$(2)/go
 	cp -furt $(BC_ROOT)/target/lib/$(2)/go/ $(BC_ROOT)/build/$(1)/$(2)/pkg $(BC_ROOT)/build/$(1)/$(2)/src
 	mkdir -p $(BC_ROOT)/target/bin/$(2)
@@ -279,7 +279,7 @@ $(BC_ROOT)/build/$(1)/$(2)/.install-stamp:
 		if test -f $$(binary); then \
 			install -m755 $$(binary) $(BC_ROOT)/target/bin/$(2);\
 		fi;)
-	touch $$@
+	mkdir -p $$(dir $$@) && touch $$@
 # END go_INSTALL PACKAGE=$(1) ARCH=$(2)
 endef
 
