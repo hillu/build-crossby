@@ -274,9 +274,7 @@ define go_INSTALL
 # go_INSTALL PACKAGE=$(1) ARCH=$(2)
 $(BC_ROOT)/stamps/install-$(1)-$($(1)_VERSION)-$(2):
 	mkdir -p $(BC_ROOT)/target/lib/$(2)/go
-	cp -furt $(BC_ROOT)/target/lib/$(2)/go/ $(BC_ROOT)/build/$(2)/$(1)-$($(1)_VERSION)/pkg $(BC_ROOT)/build/$(2)/$(1)-$($(1)_VERSION)/src
-	find $(BC_ROOT)/target/lib/$(2)/go/pkg/$(call GOOS,$(2))_$(call GOARCH,$(2)) -type f -ipath  '*/$($(1)_NAMESPACE)*' -print0 | \
-		xargs -0-t touch
+	cp -fprt $(BC_ROOT)/target/lib/$(2)/go/ $(BC_ROOT)/build/$(2)/$(1)-$($(1)_VERSION)/pkg $(BC_ROOT)/build/$(2)/$(1)-$($(1)_VERSION)/src
 	mkdir -p $(BC_ROOT)/target/bin/$(2)
 # FIXME: Add a function to filter-out filenames
 	$$(foreach binary,\
