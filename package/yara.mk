@@ -1,7 +1,5 @@
-# yara_VERSION     := 3.3.0
-# yara_URL         := https://github.com/plusvic/yara/archive/v$(yara_VERSION).tar.gz
-yara_VERSION     := 3f561594ec8230bd55f9f17e312be584755dd610
-yara_URL         := https://github.com/plusvic/yara/archive/$(yara_VERSION).tar.gz
+yara_VERSION     := 3.5.0
+yara_URL         := https://github.com/VirusTotal/yara/archive/v$(yara_VERSION).tar.gz
 yara_POSTUNPACK  := ./bootstrap.sh
 yara_BUILDSYSTEM := autoconf
 

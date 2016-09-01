@@ -1,4 +1,4 @@
-go-yara_VERSION     := 2786608186b745d0dc67a04a54c6d0e55cd68fdc
+go-yara_VERSION     := c36c17b
 go-yara_NAMESPACE   := github.com/hillu/go-yara
 go-yara_URL         := https://$(go-yara_NAMESPACE)/archive/$(go-yara_VERSION).tar.gz
 go-yara_BUILDSYSTEM := go

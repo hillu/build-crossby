@@ -1,4 +1,4 @@
-musl_VERSION     := 1.1.10
+musl_VERSION     := 1.1.15
 musl_URL         := http://www.musl-libc.org/releases/musl-$(musl_VERSION).tar.gz
 
 musl_BUILDSYSTEM := autoconf
