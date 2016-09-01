@@ -196,7 +196,7 @@ $(BC_ROOT)/stamps/build-$(1)-$($(1)_VERSION)-$(2):
 		CPPFLAGS="-I$(BC_ROOT)/target/include/$(2)" \
 		CFLAGS="$(strip $(if $(findstring x86_64,$(2)),-m64,-m32) $($(1)_CFLAGS) $($(1)_$(2)_CFLAGS))" \
 		PKG_CONFIG_PATH=$(BC_ROOT)/target/lib/$(2)/pkgconfig \
-		$($(1)_BUILDFLAGS) $($(1)_$(2)_BUILDFLAGS) \
+		$($(1)_CONFIGFLAGS) $($(1)_$(2)_CONFIGDFLAGS) \
 		--prefix=$(BC_ROOT)/target \
 		--includedir='$$$$(prefix)/include/$(2)' \
 		--mandir='$$$$(prefix)/share/man' \
@@ -207,7 +207,7 @@ $(BC_ROOT)/stamps/build-$(1)-$($(1)_VERSION)-$(2):
 		--bindir='$$$${prefix}/bin/$(2)' \
 		--sbindir='$$$${prefix}/sbin/$(2)'
 
-	$(MAKE) -C $(BC_ROOT)/build/$(2)/$(1)-$($(1)_VERSION)
+	$(MAKE) -C $(BC_ROOT)/build/$(2)/$(1)-$($(1)_VERSION) $($(1)_BUILDFLAGS) $($(1)_$(2)_BUILDFLAGS)
 	mkdir -p $$(dir $$@) && touch $$@
 # END autoconf_BUILD PACKAGE=$(1) ARCH=$(2)
 endef

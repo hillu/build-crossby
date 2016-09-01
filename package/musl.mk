@@ -3,8 +3,8 @@ musl_URL         := http://www.musl-libc.org/releases/musl-$(musl_VERSION).tar.g
 
 musl_BUILDSYSTEM := autoconf
 
-musl_x86_64-linux-musl_BUILDFLAGS := --target=x86_64
-musl_i386-linux-musl_BUILDFLAGS   := --target=i386
+# There is no compiler toolchain with (i386|x86_64)-linux-gnu prefix.
+musl_BUILDFLAGS := CROSS_COMPILE=
 
 musl_SUFFIX := .tar.gz
 musl_ARCHS  := i386-linux-musl x86_64-linux-musl

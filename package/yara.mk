@@ -3,11 +3,9 @@ yara_URL         := https://github.com/VirusTotal/yara/archive/v$(yara_VERSION).
 yara_POSTUNPACK  := ./bootstrap.sh
 yara_BUILDSYSTEM := autoconf
 
-yara_BUILDFLAGS  := --disable-magic --disable-cuckoo --without-crypto
-# yara_i686-w64-mingw32_BUILDFLGS :=
+yara_CONFIGFLAGS  := --disable-magic --disable-cuckoo --without-crypto
 
-# yara_CFLAGS      :=
-yara_i686-w64-mingw32_CFLAGS := -D__MINGW_USE_VC2005_COMPAT
+# yara_i686-w64-mingw32_CFLAGS := -D__MINGW_USE_VC2005_COMPAT
 
 yara_SUFFIX      := .tar.gz
 
