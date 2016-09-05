@@ -50,7 +50,6 @@ BC/download/$(1): $$($(1)_TARBALL)
 BC/download: BC/download/$(1)
 .PHONY: BC/download/$(1)
 # END DOWNLOAD $(1)
-
 endef
 
 define GEN_ARCH_TEMPLATE
@@ -69,11 +68,13 @@ BC/unpack: BC/unpack/$(1)/$(2)
 # END UNPACK PACKAGE=$(1) ARCH=$(2)
 
 $(if $(or $($(1)_DEPENDS),$($(1)_$(2)_DEPENDS)),
-# DEPENDENCIES $(1) $($(1)_DEPENDS)
-$(BC_ROOT)/stamps/build-$(1)-$($(1)_VERSION)-$(2): $(foreach dep,$($(1)_DEPENDS) $($(1)_$(2)_DEPENDS),$(BC_ROOT)/stamps/install-$(dep)-$($(dep)_VERSION)-$(2))
+# DEPENDENCIES $(1) $(2) $($(1)_DEPENDS)
+$(foreach dep,$($(1)_DEPENDS) $($(1)_$(2)_DEPENDS),
+$(BC_ROOT)/stamps/build-$(1)-$($(1)_VERSION)-$(2): $(BC_ROOT)/stamps/install-$(dep)-$($(dep)_VERSION)-$(2)
+)
 # END DEPENDENCIES
 ,
-# NO DEPENDENCIES FOR $(1)
+# NO DEPENDENCIES FOR $(1) $(2)
 )
 
 # BUILD PACKAGE=$(1) ARCH=$(2)
