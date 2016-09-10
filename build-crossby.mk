@@ -1,6 +1,6 @@
 # build-crossby.
 #
-# Copyright (C) 2015  Hilko Bengen
+# Copyright (C) 2015, 2016  Hilko Bengen <bengen@hilluzination.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
