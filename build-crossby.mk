@@ -104,7 +104,9 @@ BC/clear-install: BC/clear-install/$(1)/$(2)
 
 # CLEAN PACKAGE=$(1) ARCH=$(2)
 BC/clean/$(1)/$(2):
-	rm -rf $(BC_ROOT)/build/$(2)/$(1)-$($(1)_VERSION)/
+	rm -rf $(BC_ROOT)/build/$(2)/$(1)-$($(1)_VERSION)/ \
+		$(BC_ROOT)/stamps/build-$(1)-$($(1)_VERSION)-$(2) \
+		$(BC_ROOT)/stamps/unpack-$(1)-$($(1)_VERSION)-$(2)
 
 BC/clean/$(1): BC/clean/$(1)/$(2)
 BC/clean: BC/clean/$(1)/$(2)
@@ -120,7 +122,7 @@ BC/install:
 		true; \
 	done
 BC/clear-install:
-	rm -rf $(BC_ROOT)/target
+	rm -rf $(BC_ROOT)/target $(BC_ROOT)/stamps/install-*
 BC/bleach: BC/clean BC/clear-install
 	rm -rf $(BC_ROOT)/cache
 
