@@ -55,7 +55,12 @@ BC/download: BC/download/$(1)
 endef
 
 define GEN_ARCH_TEMPLATE
-$(if $(or $(if $($(1)_ARCHS),,what),$(and $($(1)_ARCHS),$(findstring $(2),$($(1)_ARCHS)))),$(call _GEN_ARCH_TEMPLATE,$(1),$(2)))
+$(if $(or
+	$(if $($(1)_ARCHS),,empty),
+	$(and
+		$($(1)_ARCHS),
+		$(findstring $(2),$($(1)_ARCHS)))),
+$(call _GEN_ARCH_TEMPLATE,$(1),$(2)))
 endef
 
 define _GEN_ARCH_TEMPLATE
