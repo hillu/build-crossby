@@ -84,7 +84,9 @@ Configuration
 - `pkg_VERSION`
 - `pkg_URL`
 - `pkg_POSTUNPACK`: Command that should be run after unpacking
-- `pkg_BUiLDSYSTEM`: The buildsystem used by this package.
+- `pkg_BUILDSYSTEM`: The buildsystem used by this package.
+- `pkg_CONFIGFLAGS`: Extra configure flags that are passed to the
+  buildsystem
 - `pkg_BUILDFLAGS`: Extra build flags that are passed to the buildsystem
 - `pkg_CFLAGS`, `pkg_$ARCH_CFLAGS`: CFLAGS variable (general,
   architecture-specific) for this package
