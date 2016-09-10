@@ -190,8 +190,6 @@ endif
 # END make_INSTALL PACKAGE=$(1) ARCH=$(2)
 endef
 
-# autoconf usually does not recognize *-linux-musl
-BC_autoconf_HOST = $(patsubst %-musl,%-gnu,$(1))
 # Use <triplet>-gcc if available, gcc otherwise
 BC_autoconf_CC   = $(or $(shell PATH=$(PATH) which $(1)-gcc),gcc)
 BC_autoconf_CXX  = $(or $(shell PATH=$(PATH) which $(1)-g++),g++)
@@ -202,7 +200,8 @@ define autoconf_BUILD
 # autoconf_BUILD PACKAGE=$(1) ARCH=$(2)
 $(BC_ROOT)/stamps/build-$(1)-$($(1)_VERSION)-$(2):
 	cd $(BC_ROOT)/build/$(2)/$(1)-$($(1)_VERSION) && ./configure \
-		--host=$$(call BC_autoconf_HOST,$(2)) \
+		--build=$(BC_PRIMARY_ARCH) \
+		--host=$(2) \
 		CC=$$(call BC_autoconf_CC,$(2)) \
 		CXX=$$(call BC_autoconf_CXX,$(2)) \
 		CPPFLAGS="-I$(BC_ROOT)/target/include/$(2)" \
