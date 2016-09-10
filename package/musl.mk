@@ -6,7 +6,6 @@ musl_BUILDSYSTEM := autoconf
 # There is no compiler toolchain with (i386|x86_64)-linux-gnu prefix.
 musl_BUILDFLAGS := CROSS_COMPILE=
 
-musl_SUFFIX := .tar.gz
 musl_ARCHS  := i386-linux-musl x86_64-linux-musl
 
 # Patch the .specs file so we can can build both i386 and x86_64

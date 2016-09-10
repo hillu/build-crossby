@@ -35,8 +35,10 @@ $(foreach pkg,$(BC_PACKAGES),$(eval include $(BC_ROOT)/package/$(pkg).mk))
 
 define GEN_INDEP_TEMPLATE
 # DOWNLOAD $(1)
-$(1)_TARBALL = $(BC_ROOT)/cache/$(1)-$($(1)_VERSION)$($(1)_SUFFIX)
-$(1)_TARBALL_LOCAL = $(BC_ROOT)/tarballs/$(1)-$($(1)_VERSION)$($(1)_SUFFIX)
+$(1)_SUFFIX := $(or $($(1)_SUFFIX),$(foreach suffix,.tar.xz .tar.bz2 .tar.gz,\
+	$(if $(filter %$(suffix),$($(1)_URL)),$(suffix))))
+$(1)_TARBALL = $(BC_ROOT)/cache/$(1)-$$($(1)_VERSION)$$($(1)_SUFFIX)
+$(1)_TARBALL_LOCAL = $(BC_ROOT)/tarballs/$(1)-$$($(1)_VERSION)$$($(1)_SUFFIX)
 $$($(1)_TARBALL):
 	mkdir -p $$(dir $$@)
 	if test -e $$($(1)_TARBALL_LOCAL); \
@@ -141,6 +143,8 @@ else ifeq ($($(1)_SUFFIX),.tar.bz2)
 	tar --strip=1 -xjf $($(1)_TARBALL) -C $(BC_ROOT)/build/$(2)/$(1)-$($(1)_VERSION)
 else ifeq ($($(1)_SUFFIX),.tar.xz)
 	tar --strip=1 -xJf $($(1)_TARBALL) -C $(BC_ROOT)/build/$(2)/$(1)-$($(1)_VERSION)
+else
+	$$(error Could not determine archive format from URL <$($(1)_URL)>.)
 endif
 	$(foreach patch,$(sort $(wildcard $(BC_ROOT)/patches/$(1)/*.patch)) \
 			$(sort $(wildcard $(BC_ROOT)/patches/$(1)/$($(1)_VERSION)/*.patch)),\

@@ -90,7 +90,9 @@ Configuration
 - `pkg_BUILDFLAGS`: Extra build flags that are passed to the buildsystem
 - `pkg_CFLAGS`, `pkg_$ARCH_CFLAGS`: CFLAGS variable (general,
   architecture-specific) for this package
-- `pkg_SUFFIX`: archive file format for this package
+- `pkg_SUFFIX`: archive file format (e.g. `.tar.gz`) for this package.
+  This is usually not needed because it can be derived from the
+  download URL (`pkg_URL`).
 - `pkg_NAMESPACE`: (specific to the `go` buildsystem): Namespace into
   which the package is installed.
 - `pkg_ARCHS`: Limits the architectures for which this package can be built
