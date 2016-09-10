@@ -8,11 +8,12 @@ easy as running a single `make` command. New source packages can be
 defined using a handful of definitions; everything beyond that is
 generated from templates.
 
-Currently supported target platforms are i386, x86_64 for Linux-based
-and MS Windows-based systems. Currently supported build systems are
-Autoconf/Automake (`configure/make/make install`) and Go (`go build/go
-install`). It should be easy to extend the system in both aspects --
-this is what I initially needed.
+Currently supported target platforms are i386, x86_64 (glibc or musl)
+for Linux-based and MS Windows-based systems. Currently supported
+build systems are Autoconf/Automake (`configure/make/make install`),
+classic Makefiles, and Go (`go build/go install`). It should be easy
+to extend the system in both aspects -- this is what I initially
+needed.
 
 Assumptions
 -----------
