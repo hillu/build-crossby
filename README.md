@@ -24,15 +24,23 @@ Assumptions
 
 - Source code is readily available for automated download via the
   network (i.e. tarballs from git commits by tag, branch, or hash),
-  but it should be cached locally. Source tarballs can also be stored
-  in a `tarballs/` subdirectory.
+  but it should be cached locally. Tarballs can also be stored in a
+  `tarballs/` subdirectory so they can be checked into source control.
 
 - Even though make has a reputation for quirky syntax, its general
   approach based upon targets, prerequisites, recipies should be
   leveraged.
 
-- Building the cross-toolchains is a problem that has been solved --
-  the task does not need to be repeated as part of this project.
+- Building the cross-toolchains is a problem that has generally been
+  solved -- the task does not need to be repeated as part of this
+  project. An i386- or amd64-based Debian GNU/Linux system can
+  generate i386 and amd64 binaries for Linux and Windows.
+  Cross-compiling Go libraries using the distribution-provided
+  toolchain has its problems because `go install` wants to install the
+  standard library into `$GOROOT`, but my inofficial
+  `golang-go-cross`[1] package should help with this problem.
+
+[1] https://github.com/hillu/golang-go-cross
 
 Usage
 -----
@@ -74,7 +82,9 @@ in `patches/$PKG/$VERSION` are used.
 - `cache` is used the downloaded source archives
 - `patches` contains package-specific patches
 - `build` is used for building packages -- individually below
-  `build/$PKG/$ARCH/`
+  `build/$ARCH/$PKG-$VERSION
+- `stamps` contains stamp files for GNU Make to track what artifacts
+  have been built.
 - `target` is the top installation directory
 
 Configuration
@@ -101,12 +111,12 @@ Configuration
 Extending
 ---------
 
-To add new buildsystems, the following functions (shell variables)
-must be implemented:
+To add new buildsystems, the following Make functions must be
+implemented:
 
-- `buildsys_UNPACK`
-- `buildsys_BUILD`
-- `buildsys_INSTALL`
+- `<buildsys>_UNPACK`
+- `<buildsys>_BUILD`
+- `<buildsys>_INSTALL`
 
 License
 -------
