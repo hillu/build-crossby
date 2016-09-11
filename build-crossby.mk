@@ -37,6 +37,11 @@ BC_BUILDDIR = $(BC_ROOT)/build/$(2)/$(1)-$($(1)_VERSION)
 # BC_GOAL STAGE,PKG,ARCH
 BC_GOAL = $(BC_ROOT)/stamps/$(1)-$(2)-$($(2)_VERSION)-$(3)
 
+# BC_CC ARCH; BC_CXX ARCH: Determine compiler to use -- not at
+# template build time, but at execution time.
+BC_CC   = $$(or $$(shell PATH=$$(PATH) which $(1)-gcc),gcc)
+BC_CXX  = $$(or $$(shell PATH=$$(PATH) which $(1)-g++),g++)
+
 # GENERIC TOP-LEVEL TEMPLATES
 # ---------------------------
 
@@ -176,6 +181,8 @@ $(call BC_GOAL,build,$(1),$(2)):
 	$(foreach tgt,$(or $(strip $($(1)_$(2)_BUILDTARGETS) $($(1)_BUILDTARGETS)),all),\
 	make -C $(call BC_BUILDDIR,$(1),$(2))/ \
 		$($(1)_BUILDFLAGS) $($(1)_$(2)_BUILDFLAGS) \
+		CC=$(or $($(1)_$(2)_CC),$($(1)_CC),$$(call BC_CC,$(2))) \
+		CXX=$(or $($(1)_$(2)_CXX),$($(1)_CXX),$$(call BC_CXX,$(2))) \
 		$(tgt) && ) true
 	mkdir -p $$(@D) && touch $$@
 # END autoconf_BUILD PACKAGE=$(1) ARCH=$(2)
@@ -197,10 +204,6 @@ endif
 # END make_INSTALL PACKAGE=$(1) ARCH=$(2)
 endef
 
-# Use <triplet>-gcc if available, gcc otherwise
-BC_autoconf_CC   = $(or $(shell PATH=$(PATH) which $(1)-gcc),gcc)
-BC_autoconf_CXX  = $(or $(shell PATH=$(PATH) which $(1)-g++),g++)
-
 # Autoconf
 autoconf_UNPACK = $(generic_UNPACK)
 define autoconf_BUILD
@@ -209,8 +212,8 @@ $(call BC_GOAL,build,$(1),$(2)):
 	cd $(call BC_BUILDDIR,$(1),$(2)) && ./configure \
 		--build=$(BC_PRIMARY_ARCH) \
 		--host=$(2) \
-		CC=$$(call BC_autoconf_CC,$(2)) \
-		CXX=$$(call BC_autoconf_CXX,$(2)) \
+		CC=$(or $($(1)_$(2)_CC),$($(1)_CC),$$(call BC_CC,$(2))) \
+		CXX=$(or $($(1)_$(2)_CXX),$($(1)_CXX),$$(call BC_CXX,$(2))) \
 		CPPFLAGS="-I$(BC_ROOT)/target/include/$(2)" \
 		CFLAGS="$(strip $(if $(findstring x86_64,$(2)),-m64,-m32) $($(1)_CFLAGS) $($(1)_$(2)_CFLAGS))" \
 		PKG_CONFIG_PATH=$(BC_ROOT)/target/lib/$(2)/pkgconfig \
@@ -254,10 +257,6 @@ GOARCH=$(strip \
         $(if $(filter i386-% i686-%,$(1)),386,\
             $(error GOARCH: unrecognized architecture $(1)))))
 
-CGO_CC=$(strip \
-    $(if $(filter %-linux-gnu,$(1)),\
-        gcc,$(1)-gcc))
-
 define go_UNPACK
 # go_UNPACK PACKAGE=$(1) ARCH=$(2)
 $(call BC_GOAL,unpack,$(1),$(2)):
@@ -280,7 +279,7 @@ $(call BC_GOAL,build,$(1),$(2)): export CGO_LDFLAGS+=$($(1)_$(2)_CGO_LDFLAGS)
 $(call BC_GOAL,build,$(1),$(2)): export GOPATH=$(call BC_BUILDDIR,$(1),$(2)):$(BC_ROOT)/target/lib/$(2)/go
 $(call BC_GOAL,build,$(1),$(2)): export GOOS=$(call GOOS,$(2))
 $(call BC_GOAL,build,$(1),$(2)): export GOARCH=$(call GOARCH,$(2))
-$(call BC_GOAL,build,$(1),$(2)): export CC=$(call CGO_CC,$(2))
+$(call BC_GOAL,build,$(1),$(2)): export CC=$(call BC_CC,$(2))
 $(call BC_GOAL,build,$(1),$(2)): export CGO_ENABLED=1
 $(call BC_GOAL,build,$(1),$(2)):
 	cd $(call BC_BUILDDIR,$(1),$(2))/ && \
