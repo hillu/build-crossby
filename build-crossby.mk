@@ -55,7 +55,7 @@ $$($1_TARBALL):
 	mkdir -p $$(dir $$@)
 	if test -e $$($1_TARBALL_LOCAL); \
 	then \
-		cp -u $$($1_TARBALL_LOCAL) $$($1_TARBALL); \
+		cp -fp $$($1_TARBALL_LOCAL) $$($1_TARBALL); \
 	else \
 		wget -c -O $$@.t $($1_URL) && mv $$@.t $$@; \
 	fi
@@ -137,7 +137,7 @@ endef
 BC/install:
 	for binary in $(BC_ROOT)/target/bin/$(BC_PRIMARY_ARCH)/*; do \
 		test -f $$binary && \
-		cp -sft $(BC_ROOT)/target/bin $$binary || \
+		ln -sf $$binary $(BC_ROOT)/target/bin/ || \
 		true; \
 	done
 BC/clear-install:
@@ -155,11 +155,11 @@ define generic_UNPACK
 $(call BC_GOAL,unpack,$1,$2):
 	mkdir -p $(call BC_BUILDDIR,$1,$2)
 ifeq ($($1_SUFFIX),.tar.gz)
-	tar --strip=1 -xzf $($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)
+	tar --strip-components=1 --use-compress-program=gzip -xf $($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)
 else ifeq ($($1_SUFFIX),.tar.bz2)
-	tar --strip=1 -xjf $($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)
+	tar --strip-components=1 --use-compress-program=gzip -xf $($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)
 else ifeq ($($1_SUFFIX),.tar.xz)
-	tar --strip=1 -xJf $($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)
+	tar --strip-components=1 --use-compress-program=gzip -xf $($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)
 else
 	$$(error Could not determine archive format from URL <$($1_URL)>.)
 endif
@@ -261,7 +261,7 @@ define go_UNPACK
 # go_UNPACK PACKAGE=$1 ARCH=$2
 $(call BC_GOAL,unpack,$1,$2):
 	mkdir -p $(call BC_BUILDDIR,$1,$2)/src/$($1_NAMESPACE)
-	tar --strip=1 -xzf $($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)/src/$($1_NAMESPACE)
+	tar --strip-components=1 -xzf $($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)/src/$($1_NAMESPACE)
 	$(foreach patch,$(sort $(wildcard $(BC_ROOT)/patches/$1/*.patch)) \
 			$(sort $(wildcard $(BC_ROOT)/patches/$1/$($1_VERSION)/*.patch)),\
 		patch -d $(call BC_BUILDDIR,$1,$2)/src/$($1_NAMESPACE) -p1 < $(patch))
@@ -291,7 +291,7 @@ define go_INSTALL
 # go_INSTALL PACKAGE=$1 ARCH=$2
 $(call BC_GOAL,install,$1,$2):
 	mkdir -p $(BC_ROOT)/target/lib/$2/go
-	cp -fprt $(BC_ROOT)/target/lib/$2/go/ $(call BC_BUILDDIR,$1,$2)/pkg $(call BC_BUILDDIR,$1,$2)/src
+	tar -C $(call BC_BUILDDIR,$1,$2) -cf - pkg src | tar -C $(BC_ROOT)/target/lib/$2/go/ -xf -
 	mkdir -p $(BC_ROOT)/target/bin/$2
 # FIXME: Add a function to filter-out filenames
 	$$(foreach binary,\
