@@ -39,8 +39,8 @@ BC_GOAL = $(BC_ROOT)/stamps/$1-$2-$($2_VERSION)-$3
 
 # BC_CC ARCH; BC_CXX ARCH: Determine compiler to use -- not at
 # template build time, but at execution time.
-BC_CC   = $$(or $$(shell PATH=$$(PATH) which $1-gcc),gcc)
-BC_CXX  = $$(or $$(shell PATH=$$(PATH) which $1-g++),g++)
+BC_CC   = $(or $(shell PATH=$(PATH) which $1-gcc),gcc)
+BC_CXX  = $(or $(shell PATH=$(PATH) which $1-g++),g++)
 
 # GENERIC TOP-LEVEL TEMPLATES
 # ---------------------------
@@ -279,7 +279,8 @@ $(call BC_GOAL,build,$1,$2): export CGO_LDFLAGS+=$($1_$2_CGO_LDFLAGS)
 $(call BC_GOAL,build,$1,$2): export GOPATH=$(call BC_BUILDDIR,$1,$2):$(BC_ROOT)/target/lib/$2/go
 $(call BC_GOAL,build,$1,$2): export GOOS=$(call GOOS,$2)
 $(call BC_GOAL,build,$1,$2): export GOARCH=$(call GOARCH,$2)
-$(call BC_GOAL,build,$1,$2): export CC=$(call BC_CC,$2)
+$(call BC_GOAL,build,$1,$2): export CC=$$(call BC_CC,$2)
+$(call BC_GOAL,build,$1,$2): export CXX=$$(call BC_CXX,$2)
 $(call BC_GOAL,build,$1,$2): export CGO_ENABLED=1
 $(call BC_GOAL,build,$1,$2):
 	cd $(call BC_BUILDDIR,$1,$2)/ && \
