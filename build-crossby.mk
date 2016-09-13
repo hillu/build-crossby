@@ -86,9 +86,9 @@ BC/unpack: BC/unpack/$1/$2
 .PHONY: BC/unpack/$1 BC/unpack/$1/$2
 # END UNPACK PACKAGE=$1 ARCH=$2
 
-$(if $(or $($1_DEPENDS),$($1_$2_DEPENDS)),
+$(if $(filter-out $1,$($1_DEPENDS) $($1_$2_DEPENDS) $(PLATFORM_$2_DEPENDS)),
 # DEPENDENCIES $1 $2 $($1_DEPENDS)
-$(foreach dep,$($1_DEPENDS) $($1_$2_DEPENDS),
+$(foreach dep,$(filter-out $1,$($1_DEPENDS) $($1_$2_DEPENDS) $(PLATFORM_$2_DEPENDS)),
 $(call BC_GOAL,build,$1,$2): $(call BC_GOAL,install,$(dep),$2)
 )
 # END DEPENDENCIES

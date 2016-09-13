@@ -10,6 +10,11 @@ musl_CC := gcc
 
 musl_ARCHS  := i386-linux-musl x86_64-linux-musl
 
+# Every package built for *-linux-musl depends on musl being installed
+# to target/, of course.
+PLATFORM_i386-linux-musl_DEPENDS   := musl
+PLATFORM_x86_64-linux-musl_DEPENDS := musl
+
 # Patch the .specs file so we can can build both i386 and x86_64
 # binaries, provided we have a multilib-enabled GCC.
 musl_x86_64-linux-musl_POSTINSTALL := \
