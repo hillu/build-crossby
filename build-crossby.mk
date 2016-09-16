@@ -265,6 +265,9 @@ $(call BC_GOAL,unpack,$1,$2):
 	$(foreach patch,$(sort $(wildcard $(BC_ROOT)/patches/$1/*.patch)) \
 			$(sort $(wildcard $(BC_ROOT)/patches/$1/$($1_VERSION)/*.patch)),\
 		patch -d $(call BC_BUILDDIR,$1,$2)/src/$($1_NAMESPACE) -p1 < $(patch))
+ifneq ($($1_POSTUNPACK),)
+	cd $(call BC_BUILDDIR,$1,$2)/src/$($1_NAMESPACE) && $($1_POSTUNPACK)
+endif
 	mkdir -p $$(@D) && touch $$@
 # END go_UNPACK PACKAGE=$1 ARCH=$2
 endef
