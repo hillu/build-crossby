@@ -328,8 +328,11 @@ BC/dump:
 	$(info $(DUMPHEADER))
 	$(foreach pkg,$(BC_PACKAGES),\
 		$(info $(call GEN_INDEP_TEMPLATE,$(pkg))) \
-		$(foreach arch,$(BC_ARCHS),\
-			$(info $(call GEN_ARCH_TEMPLATE,$(pkg),$(arch)))))
+		$(if $($(pkg)_ARCHS),\
+			$(foreach arch,$(sort $($(pkg)_ARCHS)),\
+				$(info $(call GEN_ARCH_TEMPLATE,$(pkg),$(arch)))),\
+			$(foreach arch,$(sort $(BC_ARCHS)),\
+				$(info $(call GEN_ARCH_TEMPLATE,$(pkg),$(arch))))))
 	@true
 
 ifneq (,$(BC_IMPORT))
