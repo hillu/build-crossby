@@ -118,6 +118,15 @@ implemented:
 - `<buildsys>_BUILD`
 - `<buildsys>_INSTALL`
 
+Similar projects
+----------------
+
+- [mulle-bootstrap](http://www.mulle-kybernetik.com/software/git/mulle-bootstrap/)
+  is also built on the principle that project dependencies are
+  installed into a local subdirectory. It is written as a set of
+  portable shell scripts and is mainly designed to work with git or
+  Subversion checkouts. Version pinning seems to be supported.
+
 License
 -------
 
