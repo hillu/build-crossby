@@ -23,12 +23,23 @@ BC_PROJECT  ?= default
 BC_ARCHS    ?= x86_64-linux-musl i386-linux-musl i686-w64-mingw32 x86_64-w64-mingw32
 # FIXME: Is there a better way?
 BC_PRIMARY_ARCH ?= $(shell gcc -print-multiarch)
+# Packages that we want to be built. Does not need to include dependencies
 BC_PACKAGES ?= $(patsubst %.mk,%,$(notdir $(wildcard $(BC_ROOT)/package/*.mk)))
 BC_IMPORT   ?=
 GOROOT      ?= $(shell go env GOROOT)
 
 -include $(BC_ROOT)/$(BC_PROJECT).mk
-$(foreach pkg,$(BC_PACKAGES),$(eval include $(BC_ROOT)/package/$(pkg).mk))
+
+$(foreach pkg,$(wildcard $(BC_ROOT)/package/*.mk),$(eval include $(pkg)))
+
+# All available packages
+# (The $(origin ...) call is used to filter out e.g. MAKE_VERSION.)
+BC_AVAILABLE_PACKAGES := $(sort \
+	$(BC_PACKAGES)\
+	$(patsubst %_VERSION,%,\
+		$(foreach var,$(filter %_VERSION,$(.VARIABLES)),\
+			$(if $(findstring default,$(origin $(var))),,$(var))))\
+	$(foreach pkg,$(filter %_DEPENDS,$(.VARIABLES)),$($(pkg))))
 
 # CONVENIENCE FUNCTIONS
 # ---------------------
@@ -61,7 +72,7 @@ $$($1_TARBALL):
 	fi
 
 BC/download/$1: $$($1_TARBALL)
-BC/download: BC/download/$1
+$(if $(findstring $1,$(BC_PACKAGES)),BC/download: BC/download/$1)
 .PHONY: BC/download/$1
 # END DOWNLOAD $1
 endef
@@ -82,7 +93,7 @@ $(call $($1_BUILDSYSTEM)_UNPACK,$1,$2)
 
 BC/unpack/$1/$2: $(call BC_GOAL,unpack,$1,$2)
 BC/unpack/$1: BC/unpack/$1/$2
-BC/unpack: BC/unpack/$1/$2
+$(if $(findstring $1,$(BC_PACKAGES)),BC/unpack: BC/unpack/$1/$2)
 .PHONY: BC/unpack/$1 BC/unpack/$1/$2
 # END UNPACK PACKAGE=$1 ARCH=$2
 
@@ -103,7 +114,7 @@ $(call $($1_BUILDSYSTEM)_BUILD,$1,$2)
 
 BC/build/$1/$2: $(call BC_GOAL,build,$1,$2)
 BC/build/$1: BC/build/$1/$2
-BC/build: BC/build/$1/$2
+$(if $(findstring $1,$(BC_PACKAGES)),BC/build: BC/build/$1/$2)
 .PHONY: BC/build/$1 BC/build/$1/$2
 # END BUILD PACKAGE=$1 ARCH=$2
 
@@ -114,7 +125,7 @@ $(call $($1_BUILDSYSTEM)_INSTALL,$1,$2)
 
 BC/install/$1/$2: $(call BC_GOAL,install,$1,$2)
 BC/install/$1: BC/install/$1/$2
-BC/install: BC/install/$1/$2
+$(if $(findstring $1,$(BC_PACKAGES)),BC/install: BC/install/$1/$2)
 BC/clear-install/$1/$2:
 	rm -f $(call BC_GOAL,install,$1,$2)
 BC/clear-install: BC/clear-install/$1/$2
@@ -311,7 +322,7 @@ endef
 # END OF BUILD SYSTEM-SPECIFIC TEMPLATES
 
 # This puts everything together:
-$(foreach pkg,$(BC_PACKAGES),\
+$(foreach pkg,$(BC_AVAILABLE_PACKAGES),\
 	$(eval $(call GEN_INDEP_TEMPLATE,$(pkg))) \
 	$(if $($(pkg)_ARCHS),\
 		$(foreach arch,$(sort $($(pkg)_ARCHS)),\
@@ -326,7 +337,7 @@ define DUMPHEADER
 endef
 BC/dump:
 	$(info $(DUMPHEADER))
-	$(foreach pkg,$(BC_PACKAGES),\
+	$(foreach pkg,$(BC_AVAILABLE_PACKAGES),\
 		$(info $(call GEN_INDEP_TEMPLATE,$(pkg))) \
 		$(if $($(pkg)_ARCHS),\
 			$(foreach arch,$(sort $($(pkg)_ARCHS)),\
@@ -356,6 +367,6 @@ endif
 BC/download-instructions:
 	$(info The following commands can be used to pre-download files needed in)
 	$(info $(BC_ROOT)/cache :)
-	$(foreach pkg,$(BC_PACKAGES),\
+	$(foreach pkg,$(BC_AVAILABLE_PACKAGES),\
 		$(info wget -O- $($(pkg)_URL) > $($(pkg)_TARBALL_LOCAL)))
 	@true
