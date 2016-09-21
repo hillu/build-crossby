@@ -228,7 +228,7 @@ $(call BC_GOAL,build,$1,$2):
 		CPPFLAGS="-I$(BC_ROOT)/target/include/$2" \
 		CFLAGS="$(strip $(if $(findstring x86_64,$2),-m64,-m32) $($1_CFLAGS) $($1_$2_CFLAGS))" \
 		PKG_CONFIG_PATH=$(BC_ROOT)/target/lib/$2/pkgconfig \
-		$($1_CONFIGFLAGS) $($1_$2_CONFIGDFLAGS) \
+		$($1_CONFIGFLAGS) $($1_$2_CONFIGFLAGS) \
 		--prefix=$(BC_ROOT)/target \
 		--includedir='$$$$(prefix)/include/$2' \
 		--mandir='$$$$(prefix)/share/man' \
