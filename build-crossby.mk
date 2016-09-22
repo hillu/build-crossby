@@ -46,7 +46,14 @@ BC_AVAILABLE_PACKAGES := $(sort \
 # PORTABILITY
 # -----------
 
-BC_TAR = $(firstword $(foreach tar,gnutar gtar tar,$(shell which $(tar))))
+BC_TAR := $(strip\
+	$(or\
+		$(firstword $(foreach tar,tar gtar gnutar,\
+			$(if $(and $(shell which $(tar)),\
+					$(shell $(tar) --version |\
+						head -n1 | grep -F GNU)),\
+				$(tar)))),\
+		$(error GNU tar not fuond)))
 
 # CONVENIENCE FUNCTIONS
 # ---------------------
