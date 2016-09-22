@@ -43,6 +43,11 @@ BC_AVAILABLE_PACKAGES := $(sort \
 			$(if $(findstring default,$(origin $(var))),,$(var))))\
 	$(foreach pkg,$(filter %_DEPENDS,$(.VARIABLES)),$($(pkg))))
 
+# PORTABILITY
+# -----------
+
+BC_TAR = $(firstword $(foreach tar,gnutar gtar tar,$(shell which $(tar))))
+
 # CONVENIENCE FUNCTIONS
 # ---------------------
 # BC_BUILDDIR PKG,ARCH
@@ -168,11 +173,11 @@ define generic_UNPACK
 $(call BC_GOAL,unpack,$1,$2):
 	mkdir -p $(call BC_BUILDDIR,$1,$2)
 ifeq ($($1_SUFFIX),.tar.gz)
-	tar --strip-components=1 --use-compress-program=gzip -xf $($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)
+	$(BC_TAR) --strip-components=1 --use-compress-program=gzip -xf $($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)
 else ifeq ($($1_SUFFIX),.tar.bz2)
-	tar --strip-components=1 --use-compress-program=gzip -xf $($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)
+	$(BC_TAR) --strip-components=1 --use-compress-program=bzip2 -xf $($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)
 else ifeq ($($1_SUFFIX),.tar.xz)
-	tar --strip-components=1 --use-compress-program=gzip -xf $($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)
+	$(BC_TAR) --strip-components=1 --use-compress-program=xz -xf $($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)
 else
 	$$(error Could not determine archive format from URL <$($1_URL)>.)
 endif
