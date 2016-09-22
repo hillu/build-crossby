@@ -19,6 +19,7 @@ help:
 	$(info BC_PROJECT = $(BC_PROJECT) (File: $(BC_ROOT)/$(BC_PROJECT).mk))
 	$(info BC_PACKAGES = $(BC_PACKAGES))
 	$(info BC_ARCHS = $(BC_ARCHS))
+	$(info BC_PRIMARY_ARCH = $(BC_PRIMARY_ARCH))
 	@true
 
 .PHONY: help
