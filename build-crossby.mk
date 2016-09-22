@@ -258,15 +258,16 @@ endif
 endef
 
 # Golang
-GOOS=$(strip \
-    $(if $(findstring -linux-,$1),linux,\
-        $(if $(filter %-w64-% %-mingw32,$1),windows,\
-            $(error GOOS: unrecognized architecture $1))))
+BC_GOOS=$(strip \
+	$(or $(if $(findstring -linux-,$1),linux),\
+		$(if $(filter %-w64-% %-mingw32,$1),windows),\
+		$(if $(findstring -darwin,$1),darwin,\
+		$(error GOOS: unrecognized architecture $1))))
 
-GOARCH=$(strip \
-    $(if $(filter x86_64-%,$1),amd64,\
-        $(if $(filter i386-% i686-%,$1),386,\
-            $(error GOARCH: unrecognized architecture $1))))
+BC_GOARCH=$(strip \
+	$(or $(if $(filter x86_64-%,$1),amd64),\
+		$(if $(filter i386-% i686-%,$1),386),\
+		$(error GOARCH: unrecognized architecture $1)))
 
 define go_UNPACK
 # go_UNPACK PACKAGE=$1 ARCH=$2
@@ -291,8 +292,8 @@ $(call BC_GOAL,build,$1,$2): export CGO_LDFLAGS=-L$(BC_ROOT)/target/lib/$2
 $(call BC_GOAL,build,$1,$2): export CGO_LDFLAGS+=$($1_CGO_LDFLAGS)
 $(call BC_GOAL,build,$1,$2): export CGO_LDFLAGS+=$($1_$2_CGO_LDFLAGS)
 $(call BC_GOAL,build,$1,$2): export GOPATH=$(call BC_BUILDDIR,$1,$2):$(BC_ROOT)/target/lib/$2/go
-$(call BC_GOAL,build,$1,$2): export GOOS=$(call GOOS,$2)
-$(call BC_GOAL,build,$1,$2): export GOARCH=$(call GOARCH,$2)
+$(call BC_GOAL,build,$1,$2): export GOOS=$(call BC_GOOS,$2)
+$(call BC_GOAL,build,$1,$2): export GOARCH=$(call BC_GOARCH,$2)
 $(call BC_GOAL,build,$1,$2): export CC=$$(call BC_CC,$2)
 $(call BC_GOAL,build,$1,$2): export CXX=$$(call BC_CXX,$2)
 $(call BC_GOAL,build,$1,$2): export CGO_ENABLED=1
@@ -311,7 +312,7 @@ $(call BC_GOAL,install,$1,$2):
 # FIXME: Add a function to filter-out filenames
 	$$(foreach binary,\
 		$$(wildcard $(call BC_BUILDDIR,$1,$2)/bin/* \
-			$(call BC_BUILDDIR,$1,$2)/bin/$(call GOOS,$2)_$(call GOARCH,$2_)/*),\
+			$(call BC_BUILDDIR,$1,$2)/bin/$(call BC_GOOS,$2)_$(call BC_GOARCH,$2_)/*),\
 		if test -f $$(binary); then \
 			install -m755 $$(binary) $(BC_ROOT)/target/bin/$2;\
 		fi;)
