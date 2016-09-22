@@ -50,8 +50,7 @@ BC_TAR := $(strip\
 	$(or\
 		$(firstword $(foreach tar,tar gtar gnutar,\
 			$(if $(and $(shell which $(tar)),\
-					$(shell $(tar) --version |\
-						head -n1 | grep -F GNU)),\
+					$(findstring GNU,$(shell $(tar) --version))),\
 				$(tar)))),\
 		$(error GNU tar not fuond)))
 
