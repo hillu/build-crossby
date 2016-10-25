@@ -178,21 +178,24 @@ define generic_UNPACK
 # generic_UNPACK PACKAGE=$1 ARCH=$2
 $(call BC_GOAL,unpack,$1,$2):
 	mkdir -p $(call BC_BUILDDIR,$1,$2)
-ifeq ($($1_SUFFIX),.tar.gz)
-	$(BC_TAR) --strip-components=1 --use-compress-program=gzip -xf $($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)
-else ifeq ($($1_SUFFIX),.tar.bz2)
-	$(BC_TAR) --strip-components=1 --use-compress-program=bzip2 -xf $($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)
-else ifeq ($($1_SUFFIX),.tar.xz)
-	$(BC_TAR) --strip-components=1 --use-compress-program=xz -xf $($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)
-else
-	$$(error Could not determine archive format from URL <$($1_URL)>.)
-endif
+	$(or \
+		$(if $(findstring .tar.gz,$($1_SUFFIX)),\
+			$(BC_TAR) --strip-components=1 --use-compress-program=gzip -xf \
+				$($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)), \
+		$(if $(findstring .tar.bz2,$($1_SUFFIX)),\
+			$(BC_TAR) --strip-components=1 --use-compress-program=bzip2 -xf \
+				$($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)), \
+		$(if $(findstring .tar.xz,$($1_SUFFIX)),\
+			$(BC_TAR) --strip-components=1 --use-compress-program=xz -xf \
+				$($1_TARBALL) -C $(call BC_BUILDDIR,$1,$2)), \
+		$(error Could not determine archive format from URL <$($1_URL)>.))
+
 	$(foreach patch,$(sort $(wildcard $(BC_ROOT)/patches/$1/*.patch)) \
 			$(sort $(wildcard $(BC_ROOT)/patches/$1/$($1_VERSION)/*.patch)),\
 		patch -d $(call BC_BUILDDIR,$1,$2) -p1 < $(patch) && ) true
-ifneq ($($1_POSTUNPACK),)
-	cd $(call BC_BUILDDIR,$1,$2) && $($1_POSTUNPACK)
-endif
+	$(or \
+		$(if $($1_$2_POSTUNPACK),cd $(call BC_BUILDDIR,$1,$2) && $($1_$2_POSTUNPACK)),\
+		$(if $($1_POSTUNPACK),cd $(call BC_BUILDDIR,$1,$2) && $($1_POSTUNPACK)))
 	mkdir -p $$(@D) && touch $$@
 # END generic_UNPACK PACKAGE=$1 ARCH=$2
 endef
@@ -218,12 +221,12 @@ $(call BC_GOAL,install,$1,$2):
 		$(MAKE) -C $(call BC_BUILDDIR,$1,$2)/ \
 			$($1_INSTALLFLAGS) $($1_$2_INSTALLFLAGS) \
 			$(tgt))
-ifneq ($($1_POSTINSTALL),)
-	cd $(call BC_BUILDDIR,$1,$2) && $($1_POSTINSTALL)
-endif
-ifneq ($($1_$2_POSTINSTALL),)
-	cd $(call BC_BUILDDIR,$1,$2) && $($1_$2_POSTINSTALL)
-endif
+	$(or \
+		$(if $($1_POSTINSTALL), \
+			cd $(call BC_BUILDDIR,$1,$2) && $($1_POSTINSTALL)) \
+		$(if $($1_$2_POSTINSTALL), \
+			cd $(call BC_BUILDDIR,$1,$2) && $($1_$2_POSTINSTALL)))
+
 	mkdir -p $$(@D) && touch $$@
 # END make_INSTALL PACKAGE=$1 ARCH=$2
 endef
@@ -260,12 +263,11 @@ define autoconf_INSTALL
 # autoconf_INSTALL PACKAGE=$1 ARCH=$2
 $(call BC_GOAL,install,$1,$2):
 	$(MAKE) -C $(call BC_BUILDDIR,$1,$2)/ install prefix=$(BC_ROOT)/target
-ifneq ($($1_POSTINSTALL),)
-	cd $(call BC_BUILDDIR,$1,$2) && $($1_POSTINSTALL)
-endif
-ifneq ($($1_$2_POSTINSTALL),)
-	cd $(call BC_BUILDDIR,$1,$2) && $($1_$2_POSTINSTALL)
-endif
+	$(or \
+		$(if $($1_POSTINSTALL), \
+			cd $(call BC_BUILDDIR,$1,$2) && $($1_POSTINSTALL)) \
+		$(if $($1_$2_POSTINSTALL), \
+			cd $(call BC_BUILDDIR,$1,$2) && $($1_$2_POSTINSTALL)))
 	mkdir -p $$(@D) && touch $$@
 # END autoconf_INSTALL PACKAGE=$1 ARCH=$2
 endef
@@ -290,9 +292,9 @@ $(call BC_GOAL,unpack,$1,$2):
 	$(foreach patch,$(sort $(wildcard $(BC_ROOT)/patches/$1/*.patch)) \
 			$(sort $(wildcard $(BC_ROOT)/patches/$1/$($1_VERSION)/*.patch)),\
 		patch -d $(call BC_BUILDDIR,$1,$2)/src/$($1_NAMESPACE) -p1 < $(patch))
-ifneq ($($1_POSTUNPACK),)
-	cd $(call BC_BUILDDIR,$1,$2)/src/$($1_NAMESPACE) && $($1_POSTUNPACK)
-endif
+	$(or \
+		$(if $($1_$2_POSTUNPACK),cd $(call BC_BUILDDIR,$1,$2) && $($1_$2_POSTUNPACK)),\
+		$(if $($1_POSTUNPACK),cd $(call BC_BUILDDIR,$1,$2) && $($1_POSTUNPACK)))
 	mkdir -p $$(@D) && touch $$@
 # END go_UNPACK PACKAGE=$1 ARCH=$2
 endef
