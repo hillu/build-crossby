@@ -138,7 +138,7 @@ $(call $($1_BUILDSYSTEM)_INSTALL,$1,$2)
 
 BC/install/$1/$2: $(call BC_GOAL,install,$1,$2)
 BC/install/$1: BC/install/$1/$2
-$(if $(findstring $1,$(BC_PACKAGES)),BC/install: BC/install/$1/$2)
+$(if $(findstring $1,$(BC_PACKAGES)),$(BC_ROOT)/stamps/install-ALL: $(call BC_GOAL,install,$1,$2))
 BC/clear-install/$1/$2:
 	rm -f $(call BC_GOAL,install,$1,$2)
 BC/clear-install: BC/clear-install/$1/$2
@@ -158,12 +158,14 @@ BC/clean: BC/clean/$1/$2
 
 endef
 
-BC/install:
+BC/install: $(BC_ROOT)/stamps/install-ALL
+$(BC_ROOT)/stamps/install-ALL:
 	for binary in $(BC_ROOT)/target/bin/$(BC_PRIMARY_ARCH)/*; do \
 		test -f $$binary && \
 		ln -sf $$binary $(BC_ROOT)/target/bin/ || \
 		true; \
 	done
+	touch $@
 BC/clear-install:
 	rm -rf $(BC_ROOT)/target $(BC_ROOT)/stamps/install-*
 BC/bleach: BC/clean BC/clear-install
