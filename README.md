@@ -1,3 +1,26 @@
+Note: Deprecated: Please do not use.
+====================================
+
+I have abandoned this project for a number of reasons:
+
+- I have stretched the `$(call $(eval ...))` method of generating
+  Makefile rules from templates too far: Debugging the resulting rules
+  requires too much knowledge of GNU Make details.
+
+- Generating rules becomes too slow after the number of packages
+  exceeds a dozen.
+
+- In my projects, Golang dependencies introduced cycles which can be
+  resolved inside the _go_ tool, without having to install object
+  files to the target directory.
+
+- With [golang/dep](https://github.com/golang/dep), there is a decent
+  approach to dependency management and "vendoring" for pure-Golang
+  projects. This only leaves C libraries which can be managed using a
+  much simpler Makefile.
+
+- Too many subtle bugs...
+
 build crossby
 =============
 
